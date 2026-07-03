@@ -226,6 +226,14 @@
         <span><span class="pname">Fyodor Dostoevsky</span><br><span class="pdesc">guilt · gambling · "suddenly" ×560 · more guilt</span></span>
         <span class="go">→</span>
       </button>
+      <button class="preset" data-preset="salman">
+        <span><span class="pname">Salman Khan</span><br><span class="pdesc">16 seasons of Bigg Boss · 0 weddings · shirt optional</span></span>
+        <span class="go">→</span>
+      </button>
+      <button class="preset" data-preset="cruise">
+        <span><span class="pname">Tom Cruise</span><br><span class="pdesc">32,444 ft of sprinting · 106 HALO jumps · 1 ankle</span></span>
+        <span class="go">→</span>
+      </button>
     </div>
 
     <div class="divider">or get judged yourself</div>
@@ -526,6 +534,69 @@ function dostoWrap(){
     cSummary({name:"F. DOSTOEVSKY",type:"The Guilt Enjoyer™",word:"“Suddenly” (×560)",
       stat1:["Siberia minutes","2,102,400"],stat2:["'The Gambler' speedrun","26 days"],
       top5:["Guilt","Arguing with God","Gambling debts","Fever (plot device)","Guilt (again)"],pal:PALS[1]})
+  ]};
+}
+
+function salmanWrap(){
+  return{name:"SALMAN KHAN",who:"WRAPPED · SALMAN KHAN",cards:[
+    cIntro({text:"Salman.<br>Bhai.<br>I invented shirts for a reason.",
+      sub:"One garment, Salman. I gave humanity looms, textiles, an entire fashion industry. Your torso has remained an unreached market since 1998.",pal:PALS[0]}),
+    cCount({eyebrow:"SEASONS OF BIGG BOSS HOSTED",n:16,unit:"seasons & counting",
+      sub:"Since <b>2010</b>. Every weekend you lecture strangers about their behavior on national television, then quietly pay hospital bills through Being Human on Monday. Complex character arc. And you improvised it.",pal:PALS[3]}),
+    cList({eyebrow:"YOUR TOP 5",title:"Things you actually committed to",items:[
+      ["Being Human (the brand)","31%"],["Bigg Boss weekends","26%"],["The gym","22%"],
+      ["Launching newcomers","16%"],["Marriage","0%"]],
+      sub:"Founded a charity in 2007 and funded it with T-shirts. You monetized clothing. The irony is not lost on Me.",pal:PALS[1]}),
+    cWord({eyebrow:"RELATIONSHIP STATUS AT 60",word:"Single.",
+      sub:"Sixty years. The whole nation asking. Your father explaining it to journalists. Reporters asking annually like it's a census question. You? Unbothered. At the gym.",pal:PALS[2]}),
+    cCount({eyebrow:"SHIRT SURVIVAL RATE (FULL FILM)",n:23,unit:"% and falling",
+      sub:"Divine estimate. The number drops whenever the background score swells. Physics does not apply to your buttons — I checked. They simply resign.",pal:PALS[5],dur:8500}),
+    cWord({eyebrow:"YOUR FANS, IN ONE WORD",word:"Bhaiii.",
+      sub:"Loyalty so absolute it survived Race 3. That's not a fandom anymore, that's a covenant. I know covenants. I wrote several.",pal:PALS[6]}),
+    cReceipt({title:"The receipts",rows:[
+      ["Bigg Boss contestants lectured","400+"],
+      ["Newcomer careers launched","a full IMDb page"],
+      ["Turquoise bracelets, never removed","1"],
+      ["Films where the shirt survives","disputed"],
+      ["Weekends off since 2010","0",true]],pal:PALS[4]}),
+    cCount({eyebrow:"FAN DEVOTION PERCENTILE",n:0.01,unit:"% of My creations, top bracket",
+      sub:"Somewhere right now a grown man is arguing in a comment section that Radhe was misunderstood. Unpaid. For you.",pal:PALS[3],dur:8500}),
+    cReveal({lead:"Your Sinner Personality Type is…",type:"BHAI OF ALL, HUSBAND OF NONE",
+      kicker:"CERTIFIED BY AN ENTIRE NATION",sub:"You gave everyone everything — careers, charity, cycles, weekend entertainment — except one wedding invite. Even I RSVP'd decades ago. Still holding the date.",pal:PALS[2]}),
+    cSummary({name:"SALMAN KHAN",type:"Bhai of All, Husband of None",word:"“Commitment”",
+      stat1:["Bigg Boss seasons","16+"],stat2:["Shirt survival rate","23%"],
+      top5:["Being Human","Bigg Boss weekends","The gym","Launching newcomers","Marriage (0%)"],pal:PALS[1]})
+  ]};
+}
+function cruiseWrap(){
+  return{name:"TOM CRUISE",who:"WRAPPED · TOM CRUISE",cards:[
+    cIntro({text:"Tom.<br>You've been running<br>since 1981.",
+      sub:"From what, I cannot say — and I literally know everything. 64 this year and still sprinting like the rent is due in the next frame.",pal:PALS[0]}),
+    cCount({eyebrow:"FEET SPRINTED ON SCREEN",n:32444,unit:"feet of pure cardio",
+      sub:"Four decades, six-plus miles. Rotten Tomatoes did the math: your films average <b>76.5%</b> when you run far enough in them. Your knees are load-bearing cinema.",pal:PALS[3]}),
+    cList({eyebrow:"YOUR TOP 5",title:"Coping mechanisms",items:[
+      ["Running (obviously)","38%"],["Doing your own stunts","27%"],["Sending that coconut cake","18%"],
+      ["Hanging off aircraft","12%"],["Blinking","5%"]],
+      sub:"The cake list is real. Half of Hollywood behaves all year for a bundt.",pal:PALS[1]}),
+    cCount({eyebrow:"HALO JUMPS FOR ONE SCENE",n:106,unit:"jumps at 25,000 ft",
+      sub:"For roughly three minutes of footage. Other actors use a green screen. You use the <b>troposphere</b>.",pal:PALS[4],dur:8500}),
+    cWord({eyebrow:"BONES SACRIFICED TO CINEMA",word:"1 ankle.",
+      sub:"London rooftop, 2017. You hit the wall, broke the ankle, <b>finished the take</b> — and it's in the movie. Even your X-rays have a filmography.",pal:PALS[2]}),
+    cReceipt({title:"The receipts",rows:[
+      ["Takes of you sprinting, kept","all of them"],
+      ["Minutes you can hold your breath","6+"],
+      ["Couches jumped (Oprah's)","1 — 2005"],
+      ["Insurance actuaries retired early","several"],
+      ["Stunt doubles' job security","0",true]],pal:PALS[5]}),
+    cWord({eyebrow:"PEOPLE WHO RELATE TO YOU, IN ONE WORD",word:"Winded.",
+      sub:"They watched you outrun a helicopter at 60+ and felt personally attacked on behalf of their step count.",pal:PALS[6]}),
+    cCount({eyebrow:"COMMITMENT-TO-THE-BIT PERCENTILE",n:0.001,unit:"% of My creations, all time",
+      sub:"I've seen martyrs less devoted, and they had eternal salvation on the table. You have opening weekend.",pal:PALS[3],dur:8500}),
+    cReveal({lead:"Your Sinner Personality Type is…",type:"THE HUMAN STUNT WAIVER",
+      kicker:"INSURANCE DECLINED · POLITELY",sub:"Gravity files a formal complaint against you every fiscal quarter. I keep dismissing them. The cakes help, Tom. Keep them coming.",pal:PALS[2]}),
+    cSummary({name:"TOM CRUISE",type:"The Human Stunt Waiver",word:"“Again.”",
+      stat1:["Feet sprinted on film","32,444+"],stat2:["HALO jumps","106"],
+      top5:["Running (obviously)","Own stunts","Coconut cake diplomacy","Hanging off aircraft","Blinking (5%)"],pal:PALS[1]})
   ]};
 }
 
@@ -838,10 +909,11 @@ function judge(build){
   },430);
   fill.style.width=(1/LOAD_STEPS.length*100)+"%";
 }
+var PRESETS={elon:elonWrap,dosto:dostoWrap,salman:salmanWrap,cruise:cruiseWrap};
 document.querySelectorAll(".preset").forEach(function(b){
   b.addEventListener("click",function(){
     pop();
-    judge(b.dataset.preset==="elon"?elonWrap:dostoWrap);
+    judge(PRESETS[b.dataset.preset]||elonWrap);
   });
 });
 $("custom-form").addEventListener("submit",function(e){

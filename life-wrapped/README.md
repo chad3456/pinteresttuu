@@ -8,7 +8,7 @@ no build step, no network, nothing stored.
 
 ## What's inside
 
-- **Two preset wraps**, fully written and fact-grounded where facts exist:
+- **Four preset wraps**, fully written and grounded in researched facts:
   - **Elon Musk** — minutes on the app he bought, Mars ETA (5 years away for
     the 14th consecutive year), the camel/needle situation.
   - **Fyodor Dostoevsky** — his most-quoted line on the internet ("Above all,
@@ -16,6 +16,14 @@ no build step, no network, nothing stored.
     his most used word ("suddenly," ~560× in *Crime and Punishment* per
     Toporov's count), the 26-day *Gambler* speedrun, and one word for people
     who relate to him: *Unwell.*
+  - **Salman Khan** — 16+ seasons of Bigg Boss hosted since 2010, Being Human
+    (founded 2007, funded by T-shirts), unmarried at 60 with a nation asking,
+    and a divinely estimated shirt survival rate. Sinner type: *Bhai of All,
+    Husband of None.*
+  - **Tom Cruise** — 32,444 feet sprinted on screen (Rotten Tomatoes' count;
+    films average 76.5% when he runs far enough), 106 HALO jumps at 25,000 ft
+    for one Fallout scene, and the broken ankle whose take stayed in the
+    movie. Sinner type: *The Human Stunt Waiver.*
 - **Wrap yourself**: enter a name/@handle, optionally paste your tweets/bio/
   3am notes. The app analyzes the text client-side (most used word, main
   character index from self-reference rate) and generates a wrap. Pick God's
