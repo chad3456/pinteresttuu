@@ -90,6 +90,9 @@
   #btn-judge{background:var(--ink);color:var(--lime);font-size:18px;letter-spacing:.06em;text-transform:uppercase;
     padding:17px;border-radius:14px;margin-top:4px;transition:transform .12s}
   #btn-judge:active{transform:scale(.97)}
+  #btn-judge-offline{background:transparent;color:var(--ink);border:3px solid var(--ink);font-size:13px;
+    letter-spacing:.06em;text-transform:uppercase;padding:12px;border-radius:14px;transition:transform .12s}
+  #btn-judge-offline:active{transform:scale(.97)}
   #landing .fine{font-family:var(--mono);font-weight:400;font-size:9.5px;color:#4a4638;text-align:center;line-height:1.6}
 
   /* ---------- loading ---------- */
@@ -236,19 +239,19 @@
       </button>
     </div>
 
-    <div class="divider">or get judged yourself</div>
+    <div class="divider">or search anyone. I keep files.</div>
 
     <form id="custom-form">
       <div>
-        <label for="in-name">Name / government name / @handle</label>
-        <input id="in-name" placeholder="e.g. @overthinker_2004 or Priya" maxlength="40" autocomplete="off">
+        <label for="in-name">Any personality — I'll pull their record from Wikipedia</label>
+        <input id="in-name" placeholder="e.g. Kanye West, Sepp Blatter, your favorite politician…" maxlength="60" autocomplete="off">
       </div>
       <div>
-        <label for="in-link">Twitter / Substack link (optional — for the vibes)</label>
-        <input id="in-link" placeholder="https://twitter.com/you" maxlength="120" autocomplete="off">
+        <label for="in-link">Their twitter / @handle (optional — worsens the verdict)</label>
+        <input id="in-link" placeholder="@handle" maxlength="120" autocomplete="off">
       </div>
       <div>
-        <label for="in-text">Paste your tweets / bio / 3am notes (optional — I'll read them. All of them.)</label>
+        <label for="in-text">Or paste tweets / bio / 3am notes (for wrapping yourself, offline)</label>
         <textarea id="in-text" placeholder="paste anything. I already know, this is just for the record."></textarea>
       </div>
       <div>
@@ -259,8 +262,9 @@
           <button type="button" class="vibe" data-vibe="smite">Old Testament<small>deadpan · smite-adjacent</small></button>
         </div>
       </div>
-      <button type="submit" id="btn-judge">Receive Judgment ✦</button>
-      <p class="fine">runs entirely in your browser · God does not store your data, He simply remembers it<br>parody · not affiliated with any streaming service or deity's legal team</p>
+      <button type="submit" id="btn-judge">⚡ Pull the file (live from Wikipedia)</button>
+      <button type="button" id="btn-judge-offline">Judge from vibes only (offline)</button>
+      <p class="fine">controversies compiled live from Wikipedia's public record · allegations remain allegations · text CC BY-SA<br>runs entirely in your browser · God does not store your data, He simply remembers it<br>parody · not affiliated with any streaming service or deity's legal team</p>
     </form>
   </section>
 
@@ -497,6 +501,12 @@ function elonWrap(){
       ["Companies run consecutively","also 6"],
       ["Tweets your lawyers saw too late","∞"],
       ["Planets currently habitable","1 (Mine)",true]],pal:PALS[0]}),
+    cReceipt({eyebrow:"THE DARKER LEDGER · PUBLIC RECORD",title:"Exhibits",rows:[
+      ["'Funding secured' tweet → SEC settlement","$20M · 2018"],
+      ["'Pedo guy' defamation trial (jury: not liable)","2019"],
+      ["Tesla chairmanship, surrendered to settle","2018"],
+      ["Twitter staff remaining after the purchase","~20%"],
+      ["Your lawyers' group chat, current status","muted",true]],pal:PALS[4],dur:12000}),
     cReveal({lead:"Your Sinner Personality Type is…",type:"THE MAIN CHARACTER (SELF-CAST)",
       kicker:"1 OF 1 · THANK ME",sub:"Protagonist energy. Ensemble-cast planet. You keep grabbing the mic at My open-mic night, and honestly? The crowd work is carrying.",pal:PALS[2]}),
     cSummary({name:"ELON MUSK",type:"The Main Character (self-cast)",word:"“Interesting 🤔”",
@@ -561,6 +571,12 @@ function salmanWrap(){
       ["Weekends off since 2010","0",true]],pal:PALS[4]}),
     cCount({eyebrow:"FAN DEVOTION PERCENTILE",n:0.01,unit:"% of My creations, top bracket",
       sub:"Somewhere right now a grown man is arguing in a comment section that Radhe was misunderstood. Unpaid. For you.",pal:PALS[3],dur:8500}),
+    cReceipt({eyebrow:"THE DARKER LEDGER · PUBLIC RECORD",title:"Exhibits",rows:[
+      ["Blackbuck case: convicted (appeal pending)","2018"],
+      ["Years that one 1998 hunting trip has run in court","25+"],
+      ["Hit-and-run case: acquitted after 13 years","2015"],
+      ["Crowd outside the courtroom, either way","sea of fans"],
+      ["Court dates that acquired their own court dates","several",true]],pal:PALS[0],dur:12000}),
     cReveal({lead:"Your Sinner Personality Type is…",type:"BHAI OF ALL, HUSBAND OF NONE",
       kicker:"CERTIFIED BY AN ENTIRE NATION",sub:"You gave everyone everything — careers, charity, cycles, weekend entertainment — except one wedding invite. Even I RSVP'd decades ago. Still holding the date.",pal:PALS[2]}),
     cSummary({name:"SALMAN KHAN",type:"Bhai of All, Husband of None",word:"“Commitment”",
@@ -592,12 +608,156 @@ function cruiseWrap(){
       sub:"They watched you outrun a helicopter at 60+ and felt personally attacked on behalf of their step count.",pal:PALS[6]}),
     cCount({eyebrow:"COMMITMENT-TO-THE-BIT PERCENTILE",n:0.001,unit:"% of My creations, all time",
       sub:"I've seen martyrs less devoted, and they had eternal salvation on the table. You have opening weekend.",pal:PALS[3],dur:8500}),
+    cReceipt({eyebrow:"THE DARKER LEDGER · 2005, MOSTLY",title:"Exhibits",rows:[
+      ["The couch (Oprah's)","2005"],
+      ["The 'glib' Matt Lauer interview","2005"],
+      ["The South Park episode","2005"],
+      ["Public apology to Brooke Shields","2006"],
+      ["PR apocalypses speedrun, single year","world record",true]],pal:PALS[4],dur:11000}),
     cReveal({lead:"Your Sinner Personality Type is…",type:"THE HUMAN STUNT WAIVER",
       kicker:"INSURANCE DECLINED · POLITELY",sub:"Gravity files a formal complaint against you every fiscal quarter. I keep dismissing them. The cakes help, Tom. Keep them coming.",pal:PALS[2]}),
     cSummary({name:"TOM CRUISE",type:"The Human Stunt Waiver",word:"“Again.”",
       stat1:["Feet sprinted on film","32,444+"],stat2:["HALO jumps","106"],
       top5:["Running (obviously)","Own stunts","Coconut cake diplomacy","Hanging off aircraft","Blinking (5%)"],pal:PALS[1]})
   ]};
+}
+
+/* ============ wikipedia file-pulling ============ */
+var WIKI="https://en.wikipedia.org/w/api.php";
+function wfetch(url){
+  return fetch(url).then(function(r){if(!r.ok)throw new Error("wiki "+r.status);return r.json()});
+}
+function stripWiki(t){
+  t=t.replace(/<ref[^>]*\/>/g,"").replace(/<ref[\s\S]*?<\/ref>/g,"");
+  var prev;do{prev=t;t=t.replace(/\{\{[^{}]*\}\}/g,"")}while(t!==prev); /* nested templates */
+  t=t.replace(/\[\[(?:[^|\]]*\|)?([^\]]*)\]\]/g,"$1");
+  t=t.replace(/'''?/g,"").replace(/<[^>]+>/g," ").replace(/^[=\s]*=+[^=]+=+[=\s]*$/gm," ");
+  t=t.replace(/&nbsp;/g," ").replace(/\s+/g," ");
+  return t;
+}
+/* keyword scoring: weight + category */
+var DARKK=[
+  ["convicted",6,"legal"],["indicted",6,"legal"],["arrested",5,"legal"],["charged",4,"legal"],
+  ["lawsuit",4,"legal"],["sued",4,"legal"],["fined",4,"legal"],["guilty",4,"legal"],
+  ["acquitted",4,"legal"],["settlement",3,"legal"],["settled",2,"legal"],["prison",5,"legal"],["fraud",5,"legal"],
+  ["scandal",4,"mess"],["controversy",3,"mess"],["controversial",2,"mess"],["backlash",3,"mess"],
+  ["apologized",3,"mess"],["apology",3,"mess"],["banned",4,"mess"],["boycott",3,"mess"],
+  ["criticized",2,"mess"],["outrage",3,"mess"],["fired",3,"mess"],["resigned",3,"mess"],
+  ["divorce",4,"romance"],["affair",4,"romance"],["custody",3,"romance"],
+  ["feud",4,"beef"],["dispute",2,"beef"],["rivalry",2,"beef"],
+  ["bankruptcy",4,"money"],["tax",2,"money"],["debt",2,"money"],["evasion",4,"money"],
+  ["accused",3,"mess"],["allegations",3,"mess"],["alleged",2,"mess"],["plagiarism",4,"mess"],["doping",5,"mess"]
+];
+var TYPE_BY_CAT={
+  legal:["THE LITIGATED™","EXHIBIT A (LIFESTYLE)"],
+  mess:["THE WALKING PRESS RELEASE","APOLOGY TOUR HEADLINER"],
+  romance:["THE SERIAL APOLOGIZER","COMMITTED (TO CHAOS)"],
+  beef:["THE BEEF ARCHIVIST","FEUD COLLECTOR, MINT CONDITION"],
+  money:["THE AUDIT MAGNET","CREATIVE ACCOUNTANT™"],
+  clean:["THE UNINDICTED (SO FAR)","SUSPICIOUSLY SPOTLESS"]
+};
+function mineDark(text){
+  /* skip sentences about deaths — I roast the ledger, not the graves */
+  var sents=text.split(/(?<=[.!?])\s+/).filter(function(s){
+    return s.length>40&&s.length<400&&!/\bdied\b|\bdeath\b|\bfuneral\b|\bkilled herself\b|\bsuicide\b/i.test(s);
+  });
+  var cats={legal:0,mess:0,romance:0,beef:0,money:0};
+  var wordCounts={};
+  var scored=sents.map(function(s){
+    var sc=0,low=s.toLowerCase();
+    DARKK.forEach(function(k){
+      var n=low.split(k[0]).length-1;
+      if(n>0){sc+=k[1]*n;cats[k[2]]+=n;wordCounts[k[0]]=(wordCounts[k[0]]||0)+n}
+    });
+    if(/\b(19|20)\d{2}\b/.test(s))sc+=1;
+    return[sc,s];
+  }).filter(function(p){return p[0]>=4}).sort(function(a,b){return b[0]-a[0]});
+  var topWord=null,topWordN=0;
+  Object.keys(wordCounts).forEach(function(w){if(wordCounts[w]>topWordN){topWordN=wordCounts[w];topWord=w}});
+  var topCat="clean",topCatN=0;
+  Object.keys(cats).forEach(function(c){if(cats[c]>topCatN){topCatN=cats[c];topCat=c}});
+  return{receipts:scored.slice(0,5).map(function(p){
+      var s=p[1],yr=(s.match(/\b(19|20)\d{2}\b/)||[""])[0];
+      var txt=s.replace(/\s+/g," ").trim();
+      if(txt.length>92)txt=txt.slice(0,89)+"…";
+      return[txt,yr||"—"];
+    }),
+    topWord:topWord,topWordN:topWordN,cat:topCat,heat:scored.length};
+}
+function buildWikiWrap(name,handle,vibe){
+  var V=VIBE_DATA[vibe]||VIBE_DATA.bojack;
+  var title,summary,darkSections=[],darkText="",pageLen=0;
+  return wfetch(WIKI+"?action=query&list=search&srlimit=1&format=json&origin=*&srsearch="+encodeURIComponent(name))
+  .then(function(s){
+    if(!s.query.search.length)throw new Error("nobody by that name in the Book");
+    title=s.query.search[0].title;
+    return Promise.all([
+      wfetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title.replace(/ /g,"_"))),
+      wfetch(WIKI+"?action=parse&prop=sections&format=json&origin=*&page="+encodeURIComponent(title)),
+      wfetch(WIKI+"?action=query&prop=info&format=json&origin=*&titles="+encodeURIComponent(title))
+    ]);
+  }).then(function(res){
+    summary=res[0];
+    var pages=res[2].query.pages;pageLen=pages[Object.keys(pages)[0]].length||0;
+    darkSections=res[1].parse.sections.filter(function(s){
+      return /controvers|legal|criticis|feud|scandal|lawsuit|arrest|allegat|conviction|incident|court|trial/i.test(s.line);
+    }).slice(0,4);
+    return Promise.all(darkSections.map(function(sec){
+      return wfetch(WIKI+"?action=parse&prop=wikitext&format=json&origin=*&page="+encodeURIComponent(title)+"&section="+sec.index)
+        .then(function(t){return stripWiki(t.parse.wikitext["*"]||"")})
+        .catch(function(){return ""});
+    }));
+  }).then(function(texts){
+    darkText=texts.join(" ");
+    if(darkText.length<400){ /* thin or no controversy section — mine the whole page */
+      return wfetch(WIKI+"?action=query&prop=extracts&explaintext=1&format=json&origin=*&redirects=1&titles="+encodeURIComponent(title))
+        .then(function(x){var p=x.query.pages;darkText+=" "+(p[Object.keys(p)[0]].extract||"")})
+        .catch(function(){});
+    }
+  }).then(function(){
+    var mined=mineDark(darkText);
+    var born=((summary.extract||"").match(/born[^)]*?\b(19|20)(\d{2})\b/)||[]);
+    var birthYear=born.length?parseInt(born[1]+born[2],10):null;
+    var minutes=birthYear?(new Date().getFullYear()-birthYear)*525600:null;
+    var desc=(summary.description||"public figure").replace(/^\w/,function(c){return c.toLowerCase()});
+    var dispName=title.toUpperCase();
+    var seed=hash(title+vibe);var rnd=mulberry32(seed);
+    var type=pick(rnd,TYPE_BY_CAT[mined.receipts.length?mined.cat:"clean"]);
+    var oneWord=pick(rnd,V.oneWord);
+    var cards=[
+      cIntro({eyebrow:"FILE LOCATED · "+(darkSections.length||"0")+" FLAGGED SECTION"+(darkSections.length===1?"":"S"),
+        text:dispName.split(" ")[0]+".<br>I pulled your file.",
+        sub:"The record opens: “"+(summary.extract||"").split(". ")[0].slice(0,140)+".” I wrote that part in pencil. The rest of the file… I used a pen. You'll see why.",pal:PALS[0]}),
+      minutes?cCount({eyebrow:"MINUTES EXISTED (AND COUNTING)",n:minutes,unit:"minutes on the record",
+        sub:"Every one of them witnessed. Including the ones your PR team invoiced overtime to bury.",pal:PALS[3]})
+        :cIntro({text:"Your birth year is<br>not on record.",sub:"Impressive. Even I had to check the ledger twice. The controversies, however, filed themselves under multiple dates.",pal:PALS[3]}),
+      cCount({eyebrow:"YOUR WIKIPEDIA PAGE, IN BYTES",n:pageLen,unit:"bytes of reputation management",
+        sub:"For scale: 'War and Peace' needed fewer edits. Yours is a living document. <b>Living</b> is generous — it twitches.",pal:PALS[4]}),
+      mined.receipts.length?
+        cReceipt({eyebrow:"THE PUBLIC RECORD · PER YOUR OWN WIKIPEDIA",title:"The receipts",
+          rows:mined.receipts.map(function(r,i){return i===mined.receipts.length-1?[r[0],r[1],true]:[r[0],r[1]]}),pal:PALS[5],dur:14000}):
+        cIntro({text:"No controversy<br>section found.",sub:"Nobody's record is this clean. Either you're a saint, or you have excellent lawyers. I've met the saints. You're not on the group chat.",pal:PALS[5]}),
+      mined.topWord?
+        cWord({eyebrow:"YOUR WIKIPEDIA'S FAVORITE WORD",word:"“"+mined.topWord+"”",
+          sub:"Appears <b>"+mined.topWordN+"×</b> across the flagged sections of your own encyclopedia entry. Most people get 'philanthropy'. You got a legal thesaurus.",pal:PALS[2]}):
+        cWord({eyebrow:"YOUR WIKIPEDIA'S FAVORITE WORD",word:"“cited”",sub:"Suspiciously well-behaved sourcing. The recording angel is double-checking the footnotes as we speak.",pal:PALS[2]}),
+      cWord({eyebrow:"PEOPLE WHO DEFEND YOU ONLINE, IN ONE WORD",word:oneWord,sub:V.oneWordSub,pal:PALS[6]}),
+      handle?cIntro({eyebrow:"SUPPLEMENTARY EVIDENCE",text:"I also read<br>"+handle.replace(/^@?/,"@")+".",
+        sub:"It did not help your case. The Controversies section was better written, and it had citations.",pal:PALS[3],deco:"blob"}):
+        cCount({eyebrow:"HEAT INDEX",n:Math.min(99,mined.heat*7+9),unit:"% documented chaos density",
+        sub:"Computed from flagged passages per kilobyte of biography. The recording angel wanted hazard pay.",pal:PALS[3]}),
+      cReveal({lead:"The verdict. Your Sinner Personality Type is…",type:type,
+        kicker:"SOURCE: YOUR OWN WIKIPEDIA PAGE",
+        sub:"Allegations remain allegations, convictions remain convictions, and I remain unsurprised by either. See you at the follow-up audit.",pal:PALS[2]}),
+      cSummary({name:dispName,type:type.charAt(0)+type.slice(1).toLowerCase(),
+        word:mined.topWord?"“"+mined.topWord+"” (×"+mined.topWordN+")":"“cited”",
+        stat1:["Flagged sections",String(darkSections.length)],
+        stat2:["Page size",fmt(pageLen)+" bytes"],
+        top5:mined.receipts.length?mined.receipts.map(function(r){return r[0].slice(0,34)+(r[0].length>34?"…":"")}):["A suspiciously clean record"],
+        pal:PALS[1]})
+    ];
+    return{name:dispName,who:"WRAPPED · "+dispName,cards:cards};
+  });
 }
 
 /* ============ custom generator ============ */
@@ -893,21 +1053,40 @@ document.querySelectorAll(".vibe").forEach(function(b){
   });
 });
 var LOAD_STEPS=[
-  "opening the Book of Deeds…","cross-referencing your screen time…","reviewing the drafts folder…",
-  "consulting the recording angel…","forgiving (partially)…","rendering judgment in 4K…"
+  "opening the Book of Deeds…","subpoenaing Wikipedia…","locating the Controversies section…",
+  "cross-referencing your screen time…","consulting the recording angel…","reading what the lawyers redacted…",
+  "forgiving (partially)…","rendering judgment in 4K…"
 ];
-function judge(build){
+/* build may return a wrap or a Promise of one; fallback runs if it rejects */
+function judge(build,fallback){
   $("landing").style.display="none";
   $("loading").style.display="flex";
-  var step=$("load-step"),fill=$("load-fill"),i=0;
-  step.textContent=LOAD_STEPS[0];
-  var iv=setInterval(function(){
+  var step=$("load-step"),fill=$("load-fill"),i=0,result=null,failed=false,stepsDone=false,iv;
+  step.textContent=LOAD_STEPS[0];fill.style.width="9%";
+  function finish(){
+    if(!stepsDone)return;
+    if(result){clearInterval(iv);fill.style.width="100%";startStory(result)}
+    else if(failed){clearInterval(iv);
+      if(fallback){
+        step.textContent="⚠ archives sealed here — judging from divine memory instead";
+        setTimeout(function(){startStory(fallback())},1100);
+      }else{
+        step.textContent="⚠ even I couldn't find that one";
+        setTimeout(function(){$("loading").style.display="none";$("landing").style.display="flex"},1300);
+      }
+    }
+  }
+  iv=setInterval(function(){
     i++;
-    if(i<LOAD_STEPS.length){step.textContent=LOAD_STEPS[i];blip(500+i*60,.06,"square",.06)}
-    fill.style.width=Math.min(100,(i+1)/LOAD_STEPS.length*100)+"%";
-    if(i>=LOAD_STEPS.length){clearInterval(iv);startStory(build())}
+    step.textContent=LOAD_STEPS[i%LOAD_STEPS.length];
+    blip(500+(i%8)*60,.06,"square",.06);
+    fill.style.width=Math.min(96,9+i*13)+"%";
+    if(i>=LOAD_STEPS.length-2)stepsDone=true;
+    finish();
   },430);
-  fill.style.width=(1/LOAD_STEPS.length*100)+"%";
+  Promise.resolve().then(build)
+    .then(function(w){result=w;finish()})
+    .catch(function(){failed=true;finish()});
 }
 var PRESETS={elon:elonWrap,dosto:dostoWrap,salman:salmanWrap,cruise:cruiseWrap};
 document.querySelectorAll(".preset").forEach(function(b){
@@ -918,6 +1097,13 @@ document.querySelectorAll(".preset").forEach(function(b){
 });
 $("custom-form").addEventListener("submit",function(e){
   e.preventDefault();pop();
+  var name=$("in-name").value.trim(),link=$("in-link").value.trim(),text=$("in-text").value;
+  if(!name){$("in-name").focus();$("in-name").placeholder="a name, beloved. I need a name.";return}
+  judge(function(){return buildWikiWrap(name,link,chosenVibe)},
+        function(){return customWrap(name,link,text,chosenVibe)});
+});
+$("btn-judge-offline").addEventListener("click",function(){
+  pop();
   var name=$("in-name").value.trim(),link=$("in-link").value.trim(),text=$("in-text").value;
   judge(function(){return customWrap(name,link,text,chosenVibe)});
 });

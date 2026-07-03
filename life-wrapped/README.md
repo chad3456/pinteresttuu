@@ -24,11 +24,22 @@ no build step, no network, nothing stored.
     films average 76.5% when he runs far enough), 106 HALO jumps at 25,000 ft
     for one Fallout scene, and the broken ankle whose take stayed in the
     movie. Sinner type: *The Human Stunt Waiver.*
-- **Wrap yourself**: enter a name/@handle, optionally paste your tweets/bio/
-  3am notes. The app analyzes the text client-side (most used word, main
-  character index from self-reference rate) and generates a wrap. Pick God's
-  mood: **Self-Aware Spiral** (BoJack-core), **Roast Mode** (Samay-core), or
-  **Old Testament** (smite-adjacent deadpan).
+- **Search any personality (live)**: type any public figure's name and the
+  app pulls their file from Wikipedia's public API in your browser — finds
+  the Controversies / Legal issues / Feuds sections, mines the darkest
+  documented passages into a "receipts" card (with years), counts the page's
+  favorite incriminating word, measures the page size in "bytes of reputation
+  management," and derives a sinner type from the dominant chaos category
+  (legal → *The Litigated™*, feuds → *The Beef Archivist*, spotless →
+  *The Unindicted (So Far)*). Guardrails: allegations stay labeled as
+  allegations, sentences about deaths are never used as punchlines, and every
+  receipt is quoted from the person's own Wikipedia page (CC BY-SA).
+  If the network is unavailable, it falls back to the offline generator.
+- **Wrap yourself (offline)**: enter a name/@handle, optionally paste your
+  tweets/bio/3am notes. The app analyzes the text client-side (most used
+  word, main character index from self-reference rate) and generates a wrap.
+  Pick God's mood: **Self-Aware Spiral** (BoJack-core), **Roast Mode**
+  (Samay-core), or **Old Testament** (smite-adjacent deadpan).
 
 ## Interactions (story format)
 
