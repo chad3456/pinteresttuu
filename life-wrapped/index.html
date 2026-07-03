@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Life Wrapped by God™ — your entire existence, reviewed. Dark humor, big numbers, no refunds.">
+<title>Life Wrapped — by God™</title>
+<style>
+  :root{
+    --lime:#d6f379;
+    --violet:#5f2eea;
+    --pink:#ff6eb4;
+    --cobalt:#2d46b9;
+    --tangerine:#ff7a2f;
+    --butter:#ffc864;
+    --ink:#121212;
+    --paper:#f7f4ef;
+    --black:"Avenir Next Heavy","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--ink);color:var(--paper);
+    font-family:var(--black);font-weight:900;
+    overflow:hidden;-webkit-user-select:none;user-select:none;
+  }
+  button,input,textarea,select{font:inherit;color:inherit}
+  button{background:none;border:none;cursor:pointer}
+  button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+
+  /* ---------- ambient page ---------- */
+  #ambient{position:fixed;inset:0;overflow:hidden;z-index:0}
+  #ambient .blob{position:absolute;filter:blur(70px);opacity:.5;border-radius:50%}
+  #ambient .b1{width:52vw;height:52vw;background:var(--violet);top:-14vw;left:-12vw;animation:drift 17s ease-in-out infinite alternate}
+  #ambient .b2{width:44vw;height:44vw;background:#a3126e;bottom:-16vw;right:-10vw;animation:drift 21s ease-in-out infinite alternate-reverse}
+  @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(6vw,4vh) scale(1.15)}}
+  #ambient .strip{position:absolute;left:-10%;width:120%;padding:10px 0;background:var(--lime);color:var(--ink);
+    font-size:13px;letter-spacing:.32em;text-transform:uppercase;white-space:nowrap;overflow:hidden;opacity:.92}
+  #ambient .s1{top:8%;transform:rotate(-7deg)}
+  #ambient .s2{bottom:9%;transform:rotate(5deg);background:var(--pink)}
+  .marq{display:inline-block;animation:marq 28s linear infinite}
+  @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- phone frame ---------- */
+  #phone{
+    position:fixed;z-index:2;inset:0;margin:auto;
+    width:min(430px,100vw);height:min(860px,100vh);
+    background:var(--ink);overflow:hidden;display:flex;flex-direction:column;
+  }
+  @media (min-width:500px) and (min-height:900px){
+    #phone{border-radius:30px;box-shadow:0 40px 90px rgba(0,0,0,.7),0 0 0 1px rgba(247,244,239,.14)}
+  }
+
+  /* ---------- landing ---------- */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+  .screen::-webkit-scrollbar{display:none}
+  #landing{background:var(--lime);color:var(--ink);padding:26px 24px 34px;gap:16px;z-index:5}
+  .halo-god{position:relative;display:inline-block}
+  .halo-god::before{content:"";position:absolute;left:50%;top:-.34em;transform:translateX(-50%) rotate(-14deg);
+    width:.95em;height:.3em;border:.09em solid var(--ink);border-radius:50%}
+  #landing .kicker{font-size:12px;letter-spacing:.34em;text-transform:uppercase;display:flex;justify-content:space-between}
+  #landing h1{font-size:clamp(52px,15vw,76px);line-height:.92;letter-spacing:-.03em;text-transform:uppercase;margin-top:8px}
+  #landing h1 .alt{color:var(--violet)}
+  #landing .sub{font-family:var(--mono);font-weight:400;font-size:13px;line-height:1.55;max-width:34ch}
+  .preset-row{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .preset{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--ink);color:var(--paper);padding:16px 18px;border-radius:14px;text-align:left;
+    transition:transform .12s ease}
+  .preset:hover{transform:translate(-2px,-2px) rotate(-.4deg)}
+  .preset:active{transform:scale(.97)}
+  .preset .pname{font-size:19px;letter-spacing:-.01em}
+  .preset .pdesc{font-family:var(--mono);font-weight:400;font-size:10.5px;color:#bdb6aa;margin-top:3px}
+  .preset .go{font-size:22px;color:var(--lime)}
+  .divider{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-weight:400;font-size:11px;
+    letter-spacing:.2em;text-transform:uppercase;color:#4a4638;margin:8px 0 2px}
+  .divider::before,.divider::after{content:"";flex:1;height:2px;background:var(--ink);opacity:.25}
+  #custom-form{display:flex;flex-direction:column;gap:10px}
+  #custom-form label{font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+  #custom-form input,#custom-form textarea{
+    background:var(--paper);border:3px solid var(--ink);border-radius:10px;padding:11px 12px;
+    font-family:var(--mono);font-weight:400;font-size:13px;width:100%;color:var(--ink)}
+  #custom-form textarea{min-height:64px;resize:vertical}
+  .vibes{display:flex;gap:8px;flex-wrap:wrap}
+  .vibe{flex:1;min-width:100px;background:var(--paper);border:3px solid var(--ink);border-radius:10px;
+    padding:9px 6px;font-size:12px;letter-spacing:.02em;color:var(--ink)}
+  .vibe small{display:block;font-family:var(--mono);font-weight:400;font-size:9px;margin-top:3px;color:#5a5648}
+  .vibe.sel{background:var(--violet);color:var(--paper)}
+  .vibe.sel small{color:#cfc4f5}
+  #btn-judge{background:var(--ink);color:var(--lime);font-size:18px;letter-spacing:.06em;text-transform:uppercase;
+    padding:17px;border-radius:14px;margin-top:4px;transition:transform .12s}
+  #btn-judge:active{transform:scale(.97)}
+  #landing .fine{font-family:var(--mono);font-weight:400;font-size:9.5px;color:#4a4638;text-align:center;line-height:1.6}
+
+  /* ---------- loading ---------- */
+  #loading{background:var(--ink);align-items:center;justify-content:center;gap:26px;display:none;z-index:6;text-align:center;padding:30px}
+  #loading .eye{font-size:64px;animation:pulse-eye 1.1s ease-in-out infinite}
+  @keyframes pulse-eye{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+  #loading h2{font-size:26px;text-transform:uppercase;letter-spacing:-.01em}
+  #load-step{font-family:var(--mono);font-weight:400;font-size:12.5px;color:var(--lime);min-height:20px}
+  #load-bar{width:72%;height:10px;border:3px solid var(--paper);border-radius:99px;overflow:hidden}
+  #load-fill{height:100%;width:0%;background:var(--pink)}
+
+  /* ---------- story ---------- */
+  #story{display:none;z-index:4}
+  #progress{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;gap:4px;padding:10px 12px 6px}
+  #progress i{flex:1;height:4px;border-radius:99px;background:rgba(255,255,255,.32);overflow:hidden;position:relative}
+  #progress i b{position:absolute;left:0;top:0;bottom:0;width:0%;background:currentColor;border-radius:99px}
+  #story-top{position:absolute;top:22px;left:0;right:0;z-index:20;display:flex;justify-content:space-between;
+    align-items:center;padding:8px 16px;pointer-events:none}
+  #story-top .who{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.85}
+  #story-top button{pointer-events:auto;font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;padding:6px 10px;border:2px solid currentColor;border-radius:99px;opacity:.85}
+  #cards{position:absolute;inset:0}
+  .card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+    padding:74px 26px 60px;overflow:hidden}
+  .card.leaving{animation:card-out .35s ease forwards}
+  @keyframes card-out{to{opacity:0;transform:scale(1.05)}}
+  .card .deco{position:absolute;pointer-events:none;z-index:0}
+  .card>*:not(.deco){position:relative;z-index:1}
+  .star{width:230px;height:230px;animation:spin 22s linear infinite;
+    clip-path:polygon(50% 0%,58% 32%,88% 12%,68% 42%,100% 50%,68% 58%,88% 88%,58% 68%,50% 100%,42% 68%,12% 88%,32% 58%,0% 50%,32% 42%,12% 12%,42% 32%)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .blobby{width:300px;height:300px;animation:morph 9s ease-in-out infinite alternate}
+  @keyframes morph{
+    from{border-radius:58% 42% 61% 39%/45% 51% 49% 55%}
+    to{border-radius:39% 61% 42% 58%/55% 45% 55% 45%}}
+  .ring{width:340px;height:340px;border-radius:50%;border-width:26px;border-style:solid}
+
+  .eyebrow{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+    margin-bottom:14px;opacity:.9}
+  .mega{font-size:clamp(40px,11.5vw,58px);line-height:.98;letter-spacing:-.03em;text-wrap:balance}
+  .giant-num{font-size:clamp(64px,20vw,104px);line-height:.9;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  .giant-word{font-size:clamp(56px,17vw,92px);line-height:.95;letter-spacing:-.04em;text-transform:uppercase;white-space:normal;overflow:hidden}
+  .sub{font-family:var(--mono);font-weight:400;font-size:13.5px;line-height:1.55;margin-top:18px;max-width:36ch}
+  .sub b{font-weight:700}
+  .tap-hint{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-family:var(--mono);font-weight:400;
+    font-size:10px;letter-spacing:.24em;text-transform:uppercase;opacity:.6;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+  .rank-list{display:flex;flex-direction:column;gap:13px;margin-top:8px}
+  .rank{display:flex;align-items:baseline;gap:14px;opacity:0;transform:translateX(40px)}
+  .rank.in{animation:rank-in .45s cubic-bezier(.2,1.4,.4,1) forwards}
+  @keyframes rank-in{to{opacity:1;transform:none}}
+  .rank .n{font-size:30px;min-width:34px;opacity:.95}
+  .rank .t{font-size:clamp(21px,6vw,27px);line-height:1.04;letter-spacing:-.02em}
+  .rank .pct{font-family:var(--mono);font-weight:400;font-size:11px;opacity:.75;margin-left:auto;padding-left:8px}
+
+  .quote-mark{font-size:110px;line-height:.6;margin-bottom:6px;opacity:.9}
+  .quote-text{font-size:clamp(24px,6.6vw,31px);line-height:1.16;letter-spacing:-.015em;text-wrap:balance}
+  .likes-pill{display:inline-flex;align-items:center;gap:8px;margin-top:20px;background:currentColor;border-radius:99px;padding:0}
+  .likes-pill span{color:inherit}
+  .likes-inner{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:99px;font-family:var(--mono);font-weight:700;font-size:13px}
+
+  .reveal-stage{text-align:center}
+  .reveal-q{font-size:clamp(30px,8.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .dots{font-size:44px;letter-spacing:.14em;margin-top:14px}
+  .dots span{opacity:0;animation:dot-in .5s forwards}
+  @keyframes dot-in{to{opacity:1}}
+  .type-card{margin-top:16px;background:currentColor;border-radius:20px;transform:rotate(-2deg)}
+  .type-inner{padding:26px 20px;border-radius:20px;text-align:center}
+  .type-inner .tt{font-size:clamp(30px,9vw,44px);line-height:.95;letter-spacing:-.03em;text-transform:uppercase}
+  .pop-in{opacity:0;transform:scale(.6) rotate(4deg)}
+  .pop-in.in{animation:pop .5s cubic-bezier(.2,1.6,.4,1) forwards}
+  @keyframes pop{to{opacity:1;transform:scale(1) rotate(0)}}
+
+  .receipt{background:var(--paper);color:var(--ink);border-radius:4px;padding:20px 18px;margin-top:12px;
+    font-family:var(--mono);font-weight:400;font-size:12.5px;line-height:1.9;transform:rotate(1.4deg);
+    box-shadow:0 14px 30px rgba(0,0,0,.35)}
+  .receipt .rr{display:flex;justify-content:space-between;gap:10px}
+  .receipt .rr+.rr{border-top:1.5px dashed #b9b2a4;margin-top:7px;padding-top:7px}
+  .receipt .tot{border-top:3px double #121212!important;font-weight:700}
+
+  /* summary */
+  .summary{gap:12px}
+  .sum-grid{background:var(--paper);color:var(--ink);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;
+    box-shadow:0 20px 44px rgba(0,0,0,.4)}
+  .sum-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-weight:700;
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+  .sum-name{font-size:clamp(26px,8vw,34px);letter-spacing:-.03em;line-height:.95;text-transform:uppercase}
+  .sum-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .sum-cell .lbl{font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.6}
+  .sum-cell .val{font-size:17px;line-height:1.08;letter-spacing:-.01em;margin-top:3px}
+  .sum-foot{font-family:var(--mono);font-weight:400;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    display:flex;justify-content:space-between;border-top:2px solid var(--ink);padding-top:10px}
+  .sum-actions{display:flex;gap:9px;margin-top:2px}
+  .sum-btn{flex:1;background:var(--paper);color:var(--ink);padding:14px 8px;border-radius:12px;font-size:13px;
+    letter-spacing:.04em;text-transform:uppercase;transition:transform .12s}
+  .sum-btn:active{transform:scale(.96)}
+  .sum-btn.ghost{background:transparent;color:var(--paper);border:3px solid var(--paper)}
+
+  /* tap zones */
+  .tapzone{position:absolute;top:0;bottom:0;z-index:15}
+  #tap-prev{left:0;width:32%}
+  #tap-next{right:0;width:68%}
+
+  #confetti{position:absolute;inset:0;z-index:18;pointer-events:none}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01s!important;transition-duration:.01s!important}
+  }
+</style>
+</head>
+<body>
+
+<div id="ambient" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="strip s1"><span class="marq" id="marq1"></span></div>
+  <div class="strip s2"><span class="marq" id="marq2"></span></div>
+</div>
+
+<div id="phone">
+
+  <!-- LANDING -->
+  <section class="screen" id="landing">
+    <div class="kicker"><span>EST. DAY ONE</span><span>NO REFUNDS</span></div>
+    <h1>LIFE,<br>WRAPPED.<br><span class="alt">BY <span class="halo-god">G</span>OD™</span></h1>
+    <p class="sub">I watched every minute. The screen time, the situationships, the drafts folder. Here's your year — actually, your whole existence — reviewed.</p>
+
+    <div class="preset-row">
+      <button class="preset" data-preset="elon">
+        <span><span class="pname">Elon Musk</span><br><span class="pdesc">1 planet given · 1 app purchased · 0 chill</span></span>
+        <span class="go">→</span>
+      </button>
+      <button class="preset" data-preset="dosto">
+        <span><span class="pname">Fyodor Dostoevsky</span><br><span class="pdesc">guilt · gambling · "suddenly" ×560 · more guilt</span></span>
+        <span class="go">→</span>
+      </button>
+    </div>
+
+    <div class="divider">or get judged yourself</div>
+
+    <form id="custom-form">
+      <div>
+        <label for="in-name">Name / government name / @handle</label>
+        <input id="in-name" placeholder="e.g. @overthinker_2004 or Priya" maxlength="40" autocomplete="off">
+      </div>
+      <div>
+        <label for="in-link">Twitter / Substack link (optional — for the vibes)</label>
+        <input id="in-link" placeholder="https://twitter.com/you" maxlength="120" autocomplete="off">
+      </div>
+      <div>
+        <label for="in-text">Paste your tweets / bio / 3am notes (optional — I'll read them. All of them.)</label>
+        <textarea id="in-text" placeholder="paste anything. I already know, this is just for the record."></textarea>
+      </div>
+      <div>
+        <label>Pick My mood</label>
+        <div class="vibes" role="radiogroup" aria-label="Humor vibe">
+          <button type="button" class="vibe sel" data-vibe="bojack">Self-Aware Spiral<small>bojack-core · hurts nicely</small></button>
+          <button type="button" class="vibe" data-vibe="samay">Roast Mode<small>samay-core · crowd work</small></button>
+          <button type="button" class="vibe" data-vibe="smite">Old Testament<small>deadpan · smite-adjacent</small></button>
+        </div>
+      </div>
+      <button type="submit" id="btn-judge">Receive Judgment ✦</button>
+      <p class="fine">runs entirely in your browser · God does not store your data, He simply remembers it<br>parody · not affiliated with any streaming service or deity's legal team</p>
+    </form>
+  </section>
+
+  <!-- LOADING -->
+  <section class="screen" id="loading" aria-live="polite">
+    <div class="eye">👁️</div>
+    <h2>God is judging you</h2>
+    <div id="load-step"></div>
+    <div id="load-bar"><div id="load-fill"></div></div>
+  </section>
+
+  <!-- STORY -->
+  <section class="screen" id="story">
+    <div id="progress"></div>
+    <div id="story-top">
+      <span class="who" id="who"></span>
+      <button id="btn-exit">✕ escape judgment</button>
+    </div>
+    <div id="cards"></div>
+    <canvas id="confetti"></canvas>
+    <div class="tapzone" id="tap-prev" aria-hidden="true"></div>
+    <div class="tapzone" id="tap-next" aria-hidden="true"></div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============ utils ============ */
+function $(id){return document.getElementById(id)}
+function h(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e}
+function hash(s){var x=2166136261;for(var i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)}return x>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pick(rnd,arr){return arr[Math.floor(rnd()*arr.length)]}
+function fmt(n){return Math.round(n).toLocaleString("en-US")}
+var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* marquee */
+(function(){var t="LIFE WRAPPED • BY GOD™ • JUDGED • SEALED • ";
+  $("marq1").textContent=(t+t+t+t);$("marq2").textContent=(t+t+t+t)})();
+
+/* ============ sound ============ */
+var AC=null,master=null,soundOn=true;
+function audio(){if(AC)return AC;
+  try{AC=new (window.AudioContext||window.webkitAudioContext)();
+    master=AC.createGain();master.gain.value=.4;master.connect(AC.destination);
+  }catch(e){AC=null}return AC}
+function blip(f,d,t,v){if(!audio()||!soundOn)return;if(AC.state==="suspended")AC.resume();
+  var o=AC.createOscillator(),g=AC.createGain();
+  o.type=t||"sine";o.frequency.value=f;
+  g.gain.setValueAtTime(v||.16,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+(d||.09));
+  o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+(d||.09)+.02)}
+function pop(){blip(680,.07,"square",.08)}
+function whoosh(){blip(220,.25,"sawtooth",.05);blip(440,.18,"sine",.07)}
+function fanfare(){blip(523,.16,"square",.09);setTimeout(function(){blip(659,.16,"square",.09)},110);
+  setTimeout(function(){blip(784,.3,"square",.1)},220);setTimeout(function(){blip(1046,.5,"sine",.12)},330)}
+
+/* ============ palettes ============ */
+var PALS=[
+  {bg:"#5f2eea",ink:"#f7f4ef",acc:"#d6f379"},
+  {bg:"#d6f379",ink:"#121212",acc:"#5f2eea"},
+  {bg:"#ff6eb4",ink:"#1a0b12",acc:"#f7f4ef"},
+  {bg:"#121212",ink:"#f7f4ef",acc:"#ff6eb4"},
+  {bg:"#2d46b9",ink:"#f7f4ef",acc:"#ffc864"},
+  {bg:"#ff7a2f",ink:"#121212",acc:"#f7f4ef"},
+  {bg:"#ffc864",ink:"#121212",acc:"#e1439b"}
+];
+
+/* ============ card builders ============ */
+/* each: {dur, pal?, make(root, api)} — api.done() unused; timers via api.after */
+
+function deco(kind,pal,pos){
+  var d;
+  if(kind==="star"){d=h("div","deco star");d.style.background=pal.acc}
+  else if(kind==="blob"){d=h("div","deco blobby");d.style.background=pal.acc;d.style.opacity=.9}
+  else {d=h("div","deco ring");d.style.borderColor=pal.acc}
+  d.style.cssText+=pos;return d;
+}
+function cIntro(o){return{dur:o.dur||6500,pal:o.pal,make:function(root,api){
+  root.appendChild(deco(o.deco||"star",api.pal,o.decoPos||"top:-60px;right:-70px;opacity:.9"));
+  var eb=h("div","eyebrow",o.eyebrow||"A MESSAGE FROM UPSTAIRS");
+  var m=h("div","mega",o.text);
+  var s=o.sub?h("p","sub",o.sub):null;
+  root.appendChild(eb);root.appendChild(m);if(s)root.appendChild(s);
+  root.appendChild(h("div","tap-hint","tap to continue · hold to pause"));
+}}}
+function cCount(o){return{dur:o.dur||8000,pal:o.pal,make:function(root,api){
+  root.appendChild(deco(o.deco||"ring",api.pal,o.decoPos||"bottom:-140px;left:-140px;opacity:.55"));
+  root.appendChild(h("div","eyebrow",o.eyebrow));
+  var n=h("div","giant-num","0");root.appendChild(n);
+  root.appendChild(h("div","mega",o.unit));
+  if(o.sub)root.appendChild(h("p","sub",o.sub));
+  var t0=null,D=reduced?10:1600;
+  api.raf(function(ts){
+    if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/D);
+    var ease=1-Math.pow(1-p,3);
+    n.textContent=fmt(o.n*ease);
+    if(p>=1){n.textContent=fmt(o.n);return false}
+    return true;
+  });
+  if(!reduced)api.after(300,whoosh);
+}}}
+function cList(o){return{dur:o.dur||9500,pal:o.pal,make:function(root,api){
+  root.appendChild(deco(o.deco||"blob",api.pal,o.decoPos||"top:-120px;left:-130px;opacity:.5"));
+  root.appendChild(h("div","eyebrow",o.eyebrow));
+  root.appendChild(h("div","mega",o.title));
+  var list=h("div","rank-list");root.appendChild(list);
+  o.items.forEach(function(it,i){
+    var r=h("div","rank");
+    r.appendChild(h("span","n","#"+(i+1)));
+    r.appendChild(h("span","t",it[0]));
+    if(it[1])r.appendChild(h("span","pct",it[1]));
+    list.appendChild(r);
+    api.after(500+i*420,function(){r.classList.add("in");pop()});
+  });
+  if(o.sub){var s=h("p","sub",o.sub);s.style.opacity=0;root.appendChild(s);
+    api.after(500+o.items.length*420+300,function(){s.style.transition="opacity .5s";s.style.opacity=1})}
+}}}
+function fitDown(el){ /* shrink font until nothing overflows the card */
+  var size=parseFloat(getComputedStyle(el).fontSize);
+  var guard=0;
+  while(el.scrollWidth>el.clientWidth+2&&size>24&&guard<40){
+    size*=.93;el.style.fontSize=size+"px";guard++;
+  }
+}
+function cWord(o){return{dur:o.dur||8000,pal:o.pal,make:function(root,api){
+  root.appendChild(deco(o.deco||"star",api.pal,o.decoPos||"bottom:-80px;right:-80px;opacity:.85"));
+  root.appendChild(h("div","eyebrow",o.eyebrow));
+  var w=h("div","giant-word pop-in",o.word);root.appendChild(w);
+  fitDown(w);
+  api.after(reduced?10:420,function(){w.classList.add("in");whoosh()});
+  if(o.sub){var s=h("p","sub",o.sub);s.style.opacity=0;root.appendChild(s);
+    api.after(1100,function(){s.style.transition="opacity .5s";s.style.opacity=1})}
+}}}
+function cQuote(o){return{dur:o.dur||10000,pal:o.pal,make:function(root,api){
+  root.appendChild(deco("ring",api.pal,"top:-160px;right:-160px;opacity:.5"));
+  root.appendChild(h("div","eyebrow",o.eyebrow));
+  root.appendChild(h("div","quote-mark","“"));
+  root.appendChild(h("div","quote-text",o.quote));
+  var pill=h("div","likes-pill");
+  var inner=h("span","likes-inner","❤︎ <span id='likecount'>0</span>&nbsp;"+o.likesLabel);
+  inner.style.background=api.pal.ink;inner.style.color=api.pal.bg;
+  pill.appendChild(inner);root.appendChild(pill);
+  if(o.sub)root.appendChild(h("p","sub",o.sub));
+  var lc=inner.querySelector("#likecount");
+  var t0=null,D=reduced?10:1400;
+  api.raf(function(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/D);
+    lc.textContent=fmt(o.likes*(1-Math.pow(1-p,3)));return p<1});
+}}}
+function cReveal(o){return{dur:o.dur||11000,pal:o.pal,make:function(root,api){
+  root.classList.add("reveal-stage");
+  root.appendChild(deco("star",api.pal,"top:-70px;left:-80px;opacity:.85"));
+  root.appendChild(h("div","eyebrow",o.eyebrow||"THE MOMENT YOU SCROLLED FOR"));
+  root.appendChild(h("div","reveal-q",o.lead));
+  var dots=h("div","dots");
+  [0,1,2].forEach(function(i){var sp=h("span",null,"✦");sp.style.animationDelay=(0.4+i*.5)+"s";dots.appendChild(sp)});
+  root.appendChild(dots);
+  var card=h("div","type-card pop-in");card.style.color=api.pal.ink;
+  var innerWrap=h("div","type-inner");
+  innerWrap.style.background=api.pal.ink;innerWrap.style.color=api.pal.bg;
+  innerWrap.appendChild(h("div","eyebrow",o.kicker||"CERTIFIED"));
+  innerWrap.appendChild(h("div","tt",o.type));
+  card.appendChild(innerWrap);root.appendChild(card);
+  if(o.sub){var s=h("p","sub",o.sub);s.style.opacity=0;s.style.margin="16px auto 0";root.appendChild(s);
+    api.after(2900,function(){s.style.transition="opacity .5s";s.style.opacity=1})}
+  api.after(reduced?20:2100,function(){card.classList.add("in");fanfare();api.confetti()});
+}}}
+function cReceipt(o){return{dur:o.dur||10000,pal:o.pal,make:function(root,api){
+  root.appendChild(h("div","eyebrow",o.eyebrow||"ITEMIZED. I KEEP RECEIPTS."));
+  root.appendChild(h("div","mega",o.title));
+  var rc=h("div","receipt");
+  o.rows.forEach(function(r,i){
+    var row=h("div","rr"+(r[2]?" tot":""),"<span>"+r[0]+"</span><span>"+r[1]+"</span>");
+    row.style.opacity=0;rc.appendChild(row);
+    api.after(500+i*330,function(){row.style.transition="opacity .3s";row.style.opacity=1;pop()});
+  });
+  root.appendChild(rc);
+}}}
+function cSummary(o){return{dur:Infinity,pal:o.pal,make:function(root,api){
+  root.classList.add("summary");
+  root.appendChild(h("div","eyebrow","YOUR ETERNAL RECORD · SCREENSHOT-READY"));
+  var g=h("div","sum-grid");
+  g.innerHTML=
+    '<div class="sum-head"><span>LIFE WRAPPED™</span><span>BY GOD</span></div>'+
+    '<div class="sum-name">'+o.name+'</div>'+
+    '<div class="sum-cols">'+
+      '<div class="sum-cell"><div class="lbl">Sinner type</div><div class="val">'+o.type+'</div></div>'+
+      '<div class="sum-cell"><div class="lbl">Most used word</div><div class="val">'+o.word+'</div></div>'+
+      '<div class="sum-cell"><div class="lbl">'+o.stat1[0]+'</div><div class="val">'+o.stat1[1]+'</div></div>'+
+      '<div class="sum-cell"><div class="lbl">'+o.stat2[0]+'</div><div class="val">'+o.stat2[1]+'</div></div>'+
+    '</div>'+
+    '<div class="sum-cell"><div class="lbl">Top 5</div><div class="val" style="font-size:13.5px;line-height:1.5">'+
+      o.top5.map(function(t,i){return (i+1)+". "+t}).join("<br>")+'</div></div>'+
+    '<div class="sum-foot"><span>NO REFUNDS</span><span>SEE YOU SOON ✦</span></div>';
+  root.appendChild(g);
+  var acts=h("div","sum-actions");
+  var dl=h("button","sum-btn","Save card ↓");
+  var re=h("button","sum-btn ghost","Replay");
+  var nw=h("button","sum-btn ghost","Wrap someone else");
+  dl.addEventListener("click",function(){downloadShare(o)});
+  re.addEventListener("click",function(){pop();startStory(currentWrap)});
+  nw.addEventListener("click",function(){pop();exitToLanding()});
+  acts.appendChild(dl);acts.appendChild(re);acts.appendChild(nw);
+  root.appendChild(acts);
+}}}
+
+/* ============ wraps ============ */
+function elonWrap(){
+  return{name:"ELON MUSK",who:"WRAPPED · ELON MUSK",cards:[
+    cIntro({text:"Elon.<br>We need to talk.",
+      sub:"I gave you one (1) planet. Fully loaded. Oceans, gravity, breathable air. You immediately started shopping for a fixer-upper with no atmosphere.",pal:PALS[0]}),
+    cCount({eyebrow:"MINUTES ON THE APP YOU BOUGHT",n:1447000,unit:"minutes posting",
+      sub:"You paid <b>$44,000,000,000</b> for it. That's not a social network, that's the world's most expensive coping mechanism. And it shows.",pal:PALS[3]}),
+    cList({eyebrow:"YOUR TOP 5",title:"Things that got your attention",items:[
+      ["Posting","41%"],["Renaming things 'X'","22%"],["Rockets (real)","19%"],
+      ["Beef with advertisers","16%"],["Remembering Tesla exists","2%"]],
+      sub:"Your calendar app filed a missing person report.",pal:PALS[1]}),
+    cWord({eyebrow:"YOUR MOST USED WORD",word:"“Interesting 🤔”",
+      sub:"Deployed 4,000+ times. Mostly at 3am. Mostly under posts that were, and I say this as an omniscient being, not interesting.",pal:PALS[2]}),
+    cCount({eyebrow:"MARS ARRIVAL FORECAST",n:5,unit:"years away",
+      sub:"For the <b>14th consecutive year</b>. At this point it's not a deadline, it's a horoscope.",pal:PALS[4],dur:8500}),
+    cWord({eyebrow:"YOU NAMED A CHILD",word:"LIKE A WIFI PASSWORD",
+      sub:"I've heard every name in every language that will ever exist, and I still had to sound that one out.",pal:PALS[5]}),
+    cCount({eyebrow:"NET WORTH PERCENTILE",n:0.0000001,unit:"% of My creations",
+      sub:"Top of the leaderboard. Quick reminder from the manual: camel, needle, you know the verse. Your camel is a Cybertruck. It is <b>not fitting through</b>.",pal:PALS[3],dur:8500}),
+    cWord({eyebrow:"YOUR REPLY GUYS, IN ONE WORD",word:"Unpaid.",
+      sub:"An army of interns you compensate exclusively in the word 'concerning'.",pal:PALS[6]}),
+    cReceipt({title:"The receipts",rows:[
+      ["Flamethrowers sold as 'Not-a-Flamethrower'","20,000"],
+      ["Companies run simultaneously","6"],
+      ["Companies run consecutively","also 6"],
+      ["Tweets your lawyers saw too late","∞"],
+      ["Planets currently habitable","1 (Mine)",true]],pal:PALS[0]}),
+    cReveal({lead:"Your Sinner Personality Type is…",type:"THE MAIN CHARACTER (SELF-CAST)",
+      kicker:"1 OF 1 · THANK ME",sub:"Protagonist energy. Ensemble-cast planet. You keep grabbing the mic at My open-mic night, and honestly? The crowd work is carrying.",pal:PALS[2]}),
+    cSummary({name:"ELON MUSK",type:"The Main Character (self-cast)",word:"“Interesting 🤔”",
+      stat1:["Minutes posting","1,447,000"],stat2:["Mars ETA","5 yrs (14th year running)"],
+      top5:["Posting","Renaming things X","Rockets","Advertiser beef","Remembering Tesla (2%)"],pal:PALS[1]})
+  ]};
+}
+function dostoWrap(){
+  return{name:"FYODOR DOSTOEVSKY",who:"WRAPPED · F. DOSTOEVSKY",cards:[
+    cIntro({text:"Fyodor.<br>My most subscribed complainer.",
+      sub:"144 years since you logged off, and your fans are still not okay. That's influence. That's also a group I keep an eye on.",pal:PALS[0]}),
+    cCount({eyebrow:"MINUTES SPENT IN SIBERIA",n:2102400,unit:"minutes of hard labor",
+      sub:"Four years. And the mock execution before it? Not My prank — the Tsar's. I just watched you turn it into <b>content</b> for the rest of your life. Respect.",pal:PALS[3]}),
+    cQuote({eyebrow:"YOUR MOST QUOTED LINE ON THE INTERNET",
+      quote:"Above all, don't lie to yourself.",likes:30000,likesLabel:"Goodreads likes & counting",
+      sub:"— The Brothers Karamazov. Saved by thousands of people currently lying to themselves about finishing The Brothers Karamazov.",pal:PALS[1],dur:11000}),
+    cWord({eyebrow:"YOUR MOST USED WORD",word:"Suddenly",
+      sub:"~<b>560 times</b> in Crime and Punishment alone (scholars counted — that's how bad it got). Suddenly he stood. Suddenly he wept. Fyodor. Buddy. Events can occur at a normal speed.",pal:PALS[2],dur:9500}),
+    cList({eyebrow:"YOUR TOP 5",title:"Recurring themes",items:[
+      ["Guilt","34%"],["Arguing with Me, specifically","26%"],["Gambling debts","18%"],
+      ["Fever as a plot device","12%"],["Guilt (again)","10%"]],
+      sub:"Every genre you touched became a confession booth.",pal:PALS[4]}),
+    cCount({eyebrow:"SPEEDRUN RECORD",n:26,unit:"days to write 'The Gambler'",
+      sub:"Written in 26 days to pay off <b>gambling debts</b>. A book about gambling addiction. To pay gambling debts. That's not irony, Fyodor, that's a subscription plan.",pal:PALS[5],dur:9000}),
+    cWord({eyebrow:"PEOPLE WHO RELATE TO YOU, IN ONE WORD",word:"Unwell.",
+      sub:"Affectionately. They read 40 pages of Crime and Punishment at 19 and made it a personality. They're in My DMs about it nightly.",pal:PALS[6]}),
+    cList({eyebrow:"AUDIENCE DEMOGRAPHICS",title:"Your top listeners",items:[
+      ["19-year-olds with a Notes app manifesto"],["People who type 'he's literally me'"],
+      ["Gym bros between sets"],["Your wife Anna, doing the finances"],["Turgenev (hate-reading)"]],
+      sub:"Anna said yes after 26 days of stenography, then ran your budget and saved your estate. The best plot twist you ever wrote, and you didn't write it.",pal:PALS[0],dur:11000}),
+    cCount({eyebrow:"GUILT PERCENTILE",n:0.1,unit:"% of My creations, top bracket",
+      sub:"Guilt per capita. Nobody carried more while producing this much word count. The suffering-to-output ratio remains unbeaten.",pal:PALS[3],dur:8500}),
+    cReveal({lead:"Your Sinner Personality Type is…",type:"THE GUILT ENJOYER™",
+      kicker:"REPENTS RECREATIONALLY",sub:"You didn't just feel guilt — you gave it 800 pages, a fever, and a redemption arc. And somehow made Me the love interest.",pal:PALS[2]}),
+    cSummary({name:"F. DOSTOEVSKY",type:"The Guilt Enjoyer™",word:"“Suddenly” (×560)",
+      stat1:["Siberia minutes","2,102,400"],stat2:["'The Gambler' speedrun","26 days"],
+      top5:["Guilt","Arguing with God","Gambling debts","Fever (plot device)","Guilt (again)"],pal:PALS[1]})
+  ]};
+}
+
+/* ============ custom generator ============ */
+var STOP=("the a an and or but if of to in on for with at by from as is are was were be been being am i im i'm it its it's this that these those my me mine you your yours we our ours they them their he she his her not no so do does did done have has had will would can could should just very really more most much lol lmao ok okay yeah na nah also than then there here what when who how why all any some out up down over under again too only own same about into rt & - — like get got one two u ur dont don't can't cant won't wont im").split(/\s+/);
+function analyze(text){
+  var words=(text.toLowerCase().match(/[a-z']{2,}/g)||[]);
+  var freq={},topWord=null,topN=0;
+  words.forEach(function(w){if(STOP.indexOf(w)>=0)return;freq[w]=(freq[w]||0)+1;
+    if(freq[w]>topN){topN=freq[w];topWord=w}});
+  var iCount=(text.toLowerCase().match(/\bi\b|\bi'm\b|\bme\b|\bmy\b/g)||[]).length;
+  return{
+    words:words.length,
+    topWord:topWord,topN:topN,
+    mci:words.length?Math.min(99,Math.round(iCount/words.length*400)):null, /* main character index */
+    excl:(text.match(/!/g)||[]).length,
+    q:(text.match(/\?/g)||[]).length,
+    emoji:(text.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu)||[]).length
+  };
+}
+var VIBE_DATA={
+  bojack:{
+    label:"SELF-AWARE SPIRAL EDITION",
+    intro:function(n){return n+".<br>You're responsible for your own happiness.<br>Anyway — here's the data."},
+    introSub:"You keep waiting for the version of you that has it together. I've seen the full timeline. Bring snacks.",
+    types:["THE SELF-AWARE SPIRAL","EMOTIONALLY UNAVAILABLE (BUT IN A FUN WAY)","THE ALMOST-CHANGED PERSON","HOT MESS, ROOM TEMPERATURE"],
+    kickers:["GETS IT · DOESN'T ACT ON IT","DIAGNOSED BY VIBES"],
+    revealSub:"You know exactly what your problem is. You've narrated it beautifully at 2am. Knowing was supposed to be half the battle — turns out it's the whole hobby.",
+    oneWord:["Tired.","Trying.","Aware.","Almost."],
+    oneWordSub:"They saw your playlist names and felt seen. That's not a compliment, that's a symptom you share."
+  },
+  samay:{
+    label:"ROAST MODE · CROWD WORK EDITION",
+    intro:function(n){return n+".<br>Come sit in the front row.<br>Bad idea, but come."},
+    introSub:"You chose roast mode voluntarily. Even My angels are doing crowd work now. This is on you.",
+    types:["CERTIFIED YAPPER","THE BLUNDER (CHESS TERM. ALSO YOU.)","FRONT-ROW ENERGY, BACK-ROW OUTPUT","ELO 400 IN LIFE DECISIONS"],
+    kickers:["AUDIENCE VOTED · SORRY","MIC WAS ON THE WHOLE TIME"],
+    revealSub:"You heckled the universe and the universe pulled up a chair. Every 'trust me bro' you've said is in My notebook. It's a thick notebook.",
+    oneWord:["Cooked.","Bro.","Blundered.","NPC?"],
+    oneWordSub:"They relate to you the way spectators relate to a blunder: horrified, delighted, unable to look away."
+  },
+  smite:{
+    label:"OLD TESTAMENT EDITION",
+    intro:function(n){return n+".<br>In the beginning,<br>I had such plans for you."},
+    introSub:"I parted a sea once. You can't part with one (1) subscription you don't use. We are not the same.",
+    types:["SMITE-ADJACENT","PROPHET OF DELULU","GOLDEN CALF ENJOYER","LOCUST (AFFECTIONATE)"],
+    kickers:["VERDICT · FINAL-ISH","AS FORETOLD"],
+    revealSub:"In the old days this earned forty years of wandering. You already wander — from bed to fridge — so consider the sentence served.",
+    oneWord:["Warned.","Begat.","Smited*","Chosen?"],
+    oneWordSub:"*smitten was taken. They relate to you like the Israelites related to directions: badly, for decades."
+  }
+};
+var COPES=[
+  ["Doomscrolling","the sacred scroll"],["'One more episode'","it was four"],
+  ["Gym (January only)","a religious holiday"],["Situationships","undefined, like your variables"],
+  ["Abandoned online carts","a museum of intentions"],["Astrology","blaming My decor"],
+  ["Drafts never sent","the bravest folder"],["'We move'","you did not move"],
+  ["Revenge bedtime scrolling","vengeance on yourself"],["Making playlists instead of decisions","curated avoidance"],
+  ["Opening the fridge again","nothing changed"],["Chess at 3am","blundering, spiritually"],
+  ["Googling symptoms","self-diagnosis speedrun"],["'Starting Monday'","the eternal Monday"]
+];
+var REDFLAGS=["replies 'haha' to paragraphs","says 'I'm on my way' from bed","reads self-help, skips the exercises","apologizes to furniture, not people","screenshots instead of healing","'I'm built different' (same build)","voice notes over 3 minutes","still explaining crypto at parties"];
+function customWrap(name,link,text,vibe){
+  var V=VIBE_DATA[vibe]||VIBE_DATA.bojack;
+  var seed=hash((name||"beloved stranger")+vibe);
+  var rnd=mulberry32(seed);
+  var A=text.trim()?analyze(text):null;
+  var dispName=(name||"Beloved Stranger").replace(/^@/,"").toUpperCase();
+  var minutes=Math.round(3.2e5+rnd()*2.6e5);
+  var overth=Math.round(61+rnd()*33);
+  var topWord=A&&A.topWord?A.topWord:pick(rnd,["literally","vibes","fr","insane","lowkey","actually","crazy","idk"]);
+  var topWordN=A&&A.topWord?A.topN:null;
+  var mci=A&&A.mci!==null?A.mci:Math.round(40+rnd()*55);
+  var type=pick(rnd,V.types);
+  var oneWord=pick(rnd,V.oneWord);
+  var copes=[];var pool=COPES.slice();
+  for(var i=0;i<5;i++){var idx=Math.floor(rnd()*pool.length);copes.push(pool.splice(idx,1)[0])}
+  var pcts=[Math.round(28+rnd()*14),Math.round(20+rnd()*8),Math.round(14+rnd()*6),Math.round(9+rnd()*5)];
+  pcts.push(Math.max(2,100-pcts.reduce(function(a,b){return a+b},0)));
+  var flag=pick(rnd,REDFLAGS),flag2=pick(rnd,REDFLAGS);
+  var pctile=(0.1+rnd()*1.8).toFixed(1);
+  var cards=[
+    cIntro({eyebrow:V.label,text:V.intro(dispName),sub:V.introSub+(link?" (Yes, I saw the link. I see everything. Even the drafts.)":""),pal:PALS[0]}),
+    cCount({eyebrow:"MINUTES EXISTED THIS YEAR",n:minutes,unit:"minutes, give or take",
+      sub:"Of these, <b>"+overth+"%</b> were spent overthinking a conversation that the other person does not remember having.",pal:PALS[3]}),
+    cWord({eyebrow:"YOUR MOST USED WORD",word:"“"+topWord+"”",
+      sub:topWordN?("Used <b>"+topWordN+"×</b> in the scrolls you submitted. I counted. It's kind of My thing."):"Estimated from divine surveillance, since you submitted no scrolls. The margin of error is zero.",pal:PALS[2]}),
+    cList({eyebrow:"YOUR TOP 5",title:"Coping mechanisms",
+      items:copes.map(function(c,i){return[c[0],pcts[i]+"%"]}),
+      sub:"“"+pick(rnd,copes)[1].charAt(0).toUpperCase()+pick(rnd,copes)[1].slice(1)+".” — My notes, verbatim.",pal:PALS[1]}),
+    cCount({eyebrow:"MAIN CHARACTER INDEX",n:mci,unit:"% self-narration rate",
+      sub:A?"Computed from your actual words-about-yourself ratio. The camera was never on, but you performed anyway.":"You walk to background music only you can hear. I know. I can hear it too.",pal:PALS[4]}),
+    cWord({eyebrow:"YOUR RED FLAG OF THE YEAR",word:flag,
+      sub:"Runner-up: "+flag2+". The bar was subterranean and you brought a shovel.",pal:PALS[5],dur:9000}),
+    cWord({eyebrow:"PEOPLE WHO RELATE TO YOU, IN ONE WORD",word:oneWord,sub:V.oneWordSub,pal:PALS[6]}),
+    cCount({eyebrow:"OVERTHINKER PERCENTILE",n:parseFloat(pctile),unit:"% — top bracket, your timezone",
+      sub:"You replayed one conversation so many times I started charging you rent for the memory.",pal:PALS[3],dur:8500}),
+    cReveal({lead:"Your Sinner Personality Type is…",type:type,kicker:pick(rnd,V.kickers),sub:V.revealSub,pal:PALS[2]}),
+    cSummary({name:dispName,type:type.charAt(0)+type.slice(1).toLowerCase(),word:"“"+topWord+"”",
+      stat1:["Minutes overthinking",fmt(minutes*overth/100)],stat2:["Main character index",mci+"%"],
+      top5:copes.map(function(c){return c[0]}),pal:PALS[1]})
+  ];
+  return{name:dispName,who:"WRAPPED · "+dispName,cards:cards};
+}
+
+/* ============ story engine ============ */
+var currentWrap=null,cardIdx=0,cardT=0,paused=false,rafId=null,activeRafs=[],activeTimers=[];
+var cardsEl=$("cards"),progEl=$("progress");
+function clearCardFx(){
+  activeTimers.forEach(clearTimeout);activeTimers=[];
+  activeRafs=[];
+}
+function api(pal){
+  return{
+    pal:pal,
+    after:function(ms,fn){activeTimers.push(setTimeout(fn,ms))},
+    raf:function(fn){activeRafs.push(fn)},
+    confetti:burstConfetti
+  };
+}
+function startStory(wrap){
+  currentWrap=wrap;cardIdx=0;
+  $("who").textContent=wrap.who;
+  progEl.innerHTML="";
+  wrap.cards.forEach(function(){progEl.appendChild(h("i",null,"<b></b>"))});
+  $("landing").style.display="none";
+  $("loading").style.display="none";
+  $("story").style.display="block";
+  showCard(0);
+  if(rafId===null)rafId=requestAnimationFrame(tick);
+}
+function showCard(i){
+  clearCardFx();
+  cardIdx=i;cardT=0;paused=false;
+  var c=currentWrap.cards[i];
+  var pal=c.pal||PALS[i%PALS.length];
+  /* final card is button-driven — get the tap zones out of the way */
+  var isEnd=c.dur===Infinity;
+  $("tap-prev").style.display=$("tap-next").style.display=isEnd?"none":"block";
+  cardsEl.innerHTML="";
+  var root=h("div","card");
+  root.style.background=pal.bg;root.style.color=pal.ink;
+  cardsEl.appendChild(root);
+  document.documentElement.style.setProperty("--era-accent",pal.acc);
+  progEl.style.color=pal.ink==="#121212"?"#121212":"#f7f4ef";
+  /* progress states */
+  var bars=progEl.children;
+  for(var k=0;k<bars.length;k++){
+    bars[k].firstChild.style.width=k<i?"100%":"0%";
+  }
+  c.make(root,api(pal));
+  pop();
+}
+function next(){if(!currentWrap)return;
+  if(cardIdx<currentWrap.cards.length-1)showCard(cardIdx+1);
+}
+function prev(){if(!currentWrap)return;
+  if(cardIdx>0)showCard(cardIdx-1);else{cardT=0}
+}
+var lastTs=null;
+function tick(ts){
+  rafId=requestAnimationFrame(tick);
+  var dt=lastTs?Math.min(80,ts-lastTs):16;lastTs=ts;
+  /* card rafs */
+  for(var i=activeRafs.length-1;i>=0;i--){
+    if(activeRafs[i](ts)===false)activeRafs.splice(i,1);
+  }
+  drawConfetti(dt/1000);
+  if(!currentWrap||$("story").style.display==="none")return;
+  var c=currentWrap.cards[cardIdx];
+  if(paused||c.dur===Infinity)return;
+  cardT+=dt;
+  var bar=progEl.children[cardIdx];
+  if(bar)bar.firstChild.style.width=Math.min(100,cardT/c.dur*100)+"%";
+  if(cardT>=c.dur)next();
+}
+/* tap zones: quick tap nav, hold pause */
+function bindZone(el,dir){
+  var downAt=0,held=false,hold=null;
+  function down(e){e.preventDefault();downAt=Date.now();held=false;
+    hold=setTimeout(function(){held=true;paused=true},180)}
+  function up(){clearTimeout(hold);
+    if(held){paused=false;return}
+    if(Date.now()-downAt<600){pop();dir>0?next():prev()}}
+  el.addEventListener("mousedown",down);
+  el.addEventListener("touchstart",down,{passive:false});
+  el.addEventListener("mouseup",up);el.addEventListener("mouseleave",function(){clearTimeout(hold);if(held)paused=false});
+  el.addEventListener("touchend",up);el.addEventListener("touchcancel",up);
+}
+bindZone($("tap-next"),1);bindZone($("tap-prev"),-1);
+document.addEventListener("keydown",function(e){
+  if($("story").style.display==="none")return;
+  if(e.key==="ArrowRight"||e.code==="Space"){e.preventDefault();next()}
+  else if(e.key==="ArrowLeft")prev();
+  else if(e.key==="p"||e.key==="P")paused=!paused;
+  else if(e.key==="Escape")exitToLanding();
+});
+$("btn-exit").addEventListener("click",exitToLanding);
+function exitToLanding(){
+  clearCardFx();currentWrap=null;
+  $("story").style.display="none";
+  $("landing").style.display="flex";
+}
+
+/* ============ confetti ============ */
+var conf=[],confCv=$("confetti"),confCtx=confCv.getContext("2d");
+function sizeConf(){confCv.width=confCv.clientWidth;confCv.height=confCv.clientHeight}
+function burstConfetti(){
+  if(reduced)return;
+  sizeConf();
+  var cols=["#d6f379","#ff6eb4","#ffc864","#5f2eea","#f7f4ef"];
+  for(var i=0;i<130;i++){
+    conf.push({x:confCv.width/2,y:confCv.height*.45,
+      vx:(Math.random()-.5)*560,vy:-200-Math.random()*420,
+      s:4+Math.random()*6,c:cols[i%cols.length],r:Math.random()*6.28,vr:(Math.random()-.5)*12,life:2.2});
+  }
+}
+function drawConfetti(dt){
+  if(!conf.length){confCtx.clearRect(0,0,confCv.width,confCv.height);return}
+  confCtx.clearRect(0,0,confCv.width,confCv.height);
+  for(var i=conf.length-1;i>=0;i--){
+    var p=conf[i];
+    p.vy+=900*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt;p.life-=dt;
+    if(p.life<=0||p.y>confCv.height+30){conf.splice(i,1);continue}
+    confCtx.save();confCtx.translate(p.x,p.y);confCtx.rotate(p.r);
+    confCtx.fillStyle=p.c;confCtx.globalAlpha=Math.min(1,p.life);
+    confCtx.fillRect(-p.s/2,-p.s/2,p.s,p.s*1.6);
+    confCtx.restore();
+  }
+  confCtx.globalAlpha=1;
+}
+
+/* ============ share card ============ */
+function downloadShare(o){
+  pop();
+  var W2=1080,H2=1920;
+  var cv=document.createElement("canvas");cv.width=W2;cv.height=H2;
+  var c=cv.getContext("2d");
+  c.fillStyle="#d6f379";c.fillRect(0,0,W2,H2);
+  /* deco star */
+  c.save();c.translate(W2-160,180);c.fillStyle="#5f2eea";
+  c.beginPath();
+  for(var i=0;i<16;i++){var a=i*Math.PI/8,r=(i%2?60:150);
+    c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}
+  c.closePath();c.fill();c.restore();
+  c.fillStyle="#121212";
+  c.font="900 44px Helvetica, Arial, sans-serif";
+  c.fillText("LIFE WRAPPED™ · BY GOD",70,120);
+  var nameSize=150;
+  do{c.font="900 "+nameSize+"px Helvetica, Arial, sans-serif";nameSize-=8}
+  while(c.measureText(o.name).width>W2-300&&nameSize>48);
+  c.fillText(o.name,70,360);
+  c.fillStyle="#5f2eea";
+  c.font="900 40px Helvetica, Arial, sans-serif";
+  c.fillText("SINNER TYPE",70,560);
+  c.fillStyle="#121212";c.font="900 78px Helvetica, Arial, sans-serif";
+  var yAfter=wrapTxt(c,o.type.toUpperCase(),70,650,W2-140,84);
+  c.fillStyle="#5f2eea";c.font="900 40px Helvetica, Arial, sans-serif";
+  c.fillText("MOST USED WORD",70,yAfter+120);
+  c.fillStyle="#121212";c.font="900 96px Helvetica, Arial, sans-serif";
+  c.fillText(o.word,70,yAfter+230);
+  c.fillStyle="#5f2eea";c.font="900 40px Helvetica, Arial, sans-serif";
+  c.fillText("TOP 5",70,yAfter+360);
+  c.fillStyle="#121212";c.font="700 52px Helvetica, Arial, sans-serif";
+  o.top5.forEach(function(t,i){c.fillText((i+1)+". "+t,70,yAfter+440+i*72)});
+  c.font="900 40px Helvetica, Arial, sans-serif";c.fillStyle="#5f2eea";
+  c.fillText(o.stat1[0].toUpperCase()+": "+o.stat1[1],70,H2-260);
+  c.fillText(o.stat2[0].toUpperCase()+": "+o.stat2[1],70,H2-200);
+  c.fillStyle="#121212";
+  c.fillRect(0,H2-120,W2,120);
+  c.fillStyle="#d6f379";c.font="900 40px Helvetica, Arial, sans-serif";
+  c.fillText("NO REFUNDS · SEE YOU SOON ✦",70,H2-45);
+  var a=document.createElement("a");
+  a.download="life-wrapped-"+o.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")+".png";
+  a.href=cv.toDataURL("image/png");
+  document.body.appendChild(a);a.click();a.remove();
+  function wrapTxt(c2,text,x,y,maxW,lh){
+    var words=String(text).split(" "),line="";
+    words.forEach(function(word){
+      var t=line?line+" "+word:word;
+      if(c2.measureText(t).width>maxW&&line){c2.fillText(line,x,y);line=word;y+=lh}
+      else line=t});
+    if(line){c2.fillText(line,x,y);y+=lh}
+    return y;
+  }
+}
+
+/* ============ landing wiring ============ */
+var chosenVibe="bojack";
+document.querySelectorAll(".vibe").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll(".vibe").forEach(function(x){x.classList.remove("sel")});
+    b.classList.add("sel");chosenVibe=b.dataset.vibe;pop();
+  });
+});
+var LOAD_STEPS=[
+  "opening the Book of Deeds…","cross-referencing your screen time…","reviewing the drafts folder…",
+  "consulting the recording angel…","forgiving (partially)…","rendering judgment in 4K…"
+];
+function judge(build){
+  $("landing").style.display="none";
+  $("loading").style.display="flex";
+  var step=$("load-step"),fill=$("load-fill"),i=0;
+  step.textContent=LOAD_STEPS[0];
+  var iv=setInterval(function(){
+    i++;
+    if(i<LOAD_STEPS.length){step.textContent=LOAD_STEPS[i];blip(500+i*60,.06,"square",.06)}
+    fill.style.width=Math.min(100,(i+1)/LOAD_STEPS.length*100)+"%";
+    if(i>=LOAD_STEPS.length){clearInterval(iv);startStory(build())}
+  },430);
+  fill.style.width=(1/LOAD_STEPS.length*100)+"%";
+}
+document.querySelectorAll(".preset").forEach(function(b){
+  b.addEventListener("click",function(){
+    pop();
+    judge(b.dataset.preset==="elon"?elonWrap:dostoWrap);
+  });
+});
+$("custom-form").addEventListener("submit",function(e){
+  e.preventDefault();pop();
+  var name=$("in-name").value.trim(),link=$("in-link").value.trim(),text=$("in-text").value;
+  judge(function(){return customWrap(name,link,text,chosenVibe)});
+});
+})();
+</script>
+</body>
+</html>
