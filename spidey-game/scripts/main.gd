@@ -7,11 +7,22 @@ enum State { TITLE, PLAYING, DEAD }
 
 const SAVE_PATH := "user://spidey_swing.cfg"
 const START_POS := Vector2(60.0, 380.0)
+const RESCUE_BONUS := 100
+
+## Villain rotation — zone math lives in Villains.zone_type (550 m levels).
+const LEVELS := [
+	{"name": "THE VULTURE", "hint": "watch the skies", "tint": Color(0.24, 0.43, 0.22, 0.17)},
+	{"name": "DOC OCK", "hint": "mind the tentacles", "tint": Color(0.75, 0.43, 0.12, 0.15)},
+	{"name": "VENOM", "hint": "webs won't stick to the goo", "tint": Color(0.14, 0.03, 0.23, 0.3)},
+]
 
 var state: int = State.TITLE
 var score := 0
+var bonus := 0
 var best := 0
 var died_at_ms := 0
+var input_held := false
+var cur_lvl := 0
 
 var city: City
 var player: Player
@@ -20,6 +31,9 @@ var camera: Camera2D
 var web_line: Line2D
 var trail: Line2D
 var trail_points: Array[Vector2] = []
+var villains: Villains
+var rescue: Rescue
+var tint_rect: ColorRect
 
 
 func _ready() -> void:
@@ -28,6 +42,14 @@ func _ready() -> void:
 
 	city = City.new()
 	add_child(city)
+
+	villains = Villains.new()
+	villains.z_index = 4
+	add_child(villains)
+
+	rescue = Rescue.new(city)
+	rescue.z_index = 3
+	add_child(rescue)
 
 	trail = Line2D.new()
 	trail.width = 10.0
@@ -78,6 +100,15 @@ func _build_sky() -> void:
 	rect.stretch_mode = TextureRect.STRETCH_SCALE
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(rect)
+	# villain sky tint, lerped per level
+	var tint_layer := CanvasLayer.new()
+	tint_layer.layer = -105
+	add_child(tint_layer)
+	tint_rect = ColorRect.new()
+	tint_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tint_rect.color = LEVELS[0].tint
+	tint_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tint_layer.add_child(tint_rect)
 
 
 func _build_parallax() -> void:
@@ -97,9 +128,14 @@ func _build_parallax() -> void:
 
 func _reset() -> void:
 	score = 0
+	bonus = 0
+	cur_lvl = 0
+	input_held = false
 	trail_points.clear()
 	trail.clear_points()
 	web_line.visible = false
+	villains.reset()
+	rescue.reset()
 	city.ensure_generated(START_POS.x + 2400.0)
 	var perch := Vector2(START_POS.x, city.roof_at(START_POS.x) - 34.0)
 	player.reset(perch)
@@ -131,10 +167,13 @@ func _on_press() -> void:
 	match state:
 		State.TITLE:
 			state = State.PLAYING
+			input_held = true
 			hud.mode_playing()
+			hud.show_banner(LEVELS[0].name, LEVELS[0].hint)
 			player.attach(city.get_anchor(player.position))
 			web_line.visible = true
 		State.PLAYING:
+			input_held = true
 			player.attach(city.get_anchor(player.position))
 			web_line.visible = true
 		State.DEAD:
@@ -144,6 +183,7 @@ func _on_press() -> void:
 
 
 func _on_release() -> void:
+	input_held = false
 	if state == State.PLAYING:
 		player.release()
 		web_line.visible = false
@@ -164,6 +204,45 @@ func _tick_playing(delta: float) -> void:
 	city.prune(camera.position.x - 2600.0)
 	player.step(delta)
 
+	# still holding after a knock? re-fire the web — vital on touch
+	if input_held and not player.attached and player.invuln > 0.0 and player.invuln < 0.85:
+		player.attach(city.get_anchor(player.position))
+		web_line.visible = true
+
+	var meters := int(player.position.x / 50.0)
+
+	# villains: hit cuts the web (and costs you MJ)
+	if villains.step(delta, player.position, player.invuln > 0.0, meters, camera.position.x):
+		if player.hit():
+			web_line.visible = false
+			if rescue.carrying():
+				rescue.snatch(player.position.x)
+				player.carrying = false
+				hud.popup("MJ WAS SNATCHED!", Color(1.0, 0.56, 0.66))
+			else:
+				hud.popup("WEB CUT!", Color(1.0, 0.85, 0.54))
+
+	# MJ rescue loop
+	match rescue.step(player.position, camera.position.x):
+		1:
+			player.carrying = true
+			hud.popup("GOT MJ — GET HER TO THE GREEN ROOF!", Color(0.56, 1.0, 0.69))
+		2:
+			player.carrying = false
+			bonus += RESCUE_BONUS
+			hud.popup("MJ IS SAFE!  +" + str(RESCUE_BONUS) + " m", Color(0.56, 1.0, 0.69))
+	hud.set_carry(rescue.safe_meters_left(player.position.x) if rescue.carrying() else -1)
+	hud.set_mj(rescue.saved)
+
+	# level rotation + villain sky
+	var lvl := int(maxf(0.0, float(meters)) / 550.0)
+	var typ := lvl % 3
+	if lvl != cur_lvl:
+		cur_lvl = lvl
+		hud.show_banner(LEVELS[typ].name, LEVELS[typ].hint)
+	hud.set_level(cur_lvl + 1, LEVELS[typ].name)
+	tint_rect.color = tint_rect.color.lerp(LEVELS[typ].tint, minf(1.0, delta * 2.0))
+
 	if player.attached:
 		web_line.points = PackedVector2Array([player.hand_point(), player.anchor])
 
@@ -172,9 +251,8 @@ func _tick_playing(delta: float) -> void:
 		trail_points.remove_at(0)
 	trail.points = PackedVector2Array(trail_points)
 
-	var meters := int(player.position.x / 50.0)
-	if meters > score:
-		score = meters
+	if meters + bonus > score:
+		score = meters + bonus
 	hud.set_score(score, maxi(best, score))
 
 	# camera: lookahead + speed zoom
@@ -196,13 +274,14 @@ func _tick_playing(delta: float) -> void:
 func _die() -> void:
 	state = State.DEAD
 	died_at_ms = Time.get_ticks_msec()
+	input_held = false
 	web_line.visible = false
 	player.position.y = City.STREET_Y - 16.0
 	var new_best := score > best
 	if new_best:
 		best = score
 		_save_best()
-	hud.mode_dead(score, best, new_best)
+	hud.mode_dead(score, best, new_best, rescue.carrying(), rescue.saved)
 
 
 func _load_best() -> int:

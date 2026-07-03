@@ -14,12 +14,27 @@ const BRICKS := [
 var rng := RandomNumberGenerator.new()
 var next_x := -600.0
 var anchors: Array[Vector2] = []
+var anchor_goo: Array[bool] = []   # kept in sync with anchors
 var pieces: Array[Node2D] = []
 var buildings_since_trestle := 0
 
 
 func _init() -> void:
 	rng.seed = 20260703
+
+
+func _process(_delta: float) -> void:
+	queue_redraw()   # venom goo blobs animate with the level
+
+
+## Venom zone check — keep the 550 m level math in sync with villains.gd.
+func _gooed(x: float) -> bool:
+	return Villains.zone_type(x) == 2 and rng.randf() < 0.35
+
+
+func _add_anchor(a: Vector2, goo: bool) -> void:
+	anchors.append(a)
+	anchor_goo.append(goo)
 
 
 func ensure_generated(up_to_x: float) -> void:
@@ -38,6 +53,7 @@ func prune(before_x: float) -> void:
 		pieces.remove_at(0)
 	while anchors.size() > 0 and anchors[0].x + 900.0 < before_x:
 		anchors.remove_at(0)
+		anchor_goo.remove_at(0)
 
 
 ## Best web anchor for a player at p: ahead and above, favoring a ~45 degree rope.
@@ -45,7 +61,10 @@ func prune(before_x: float) -> void:
 func get_anchor(p: Vector2) -> Vector2:
 	var best := Vector2.ZERO
 	var best_score := -1.0e20
-	for a in anchors:
+	for i in range(anchors.size()):
+		if anchor_goo[i]:
+			continue   # venom goo: web won't stick
+		var a := anchors[i]
 		var dx := a.x - p.x
 		var dy := a.y - p.y   # negative = above us
 		if dx < 90.0 or dx > 780.0 or dy > -90.0:
@@ -67,6 +86,26 @@ func roof_at(x: float) -> float:
 	return 420.0
 
 
+## First building at or past x (MJ spawns, safe roofs).
+func building_after(x: float) -> Building:
+	for p in pieces:
+		if p is Building and p.position.x >= x:
+			return p
+	return null
+
+
+func _draw() -> void:
+	# venom goo dripping from blocked anchors
+	var goo := Color("14101c")
+	for i in range(anchors.size()):
+		if not anchor_goo[i]:
+			continue
+		var a := anchors[i]
+		draw_circle(a, 9.0, goo)
+		draw_rect(Rect2(a.x - 3.0, a.y, 6.0, 18.0), goo)
+		draw_rect(Rect2(a.x + 6.0, a.y, 4.0, 11.0), goo)
+
+
 func _spawn_building() -> void:
 	var w := rng.randf_range(190.0, 390.0)
 	var roof := rng.randf_range(150.0, 470.0)
@@ -80,10 +119,10 @@ func _spawn_building() -> void:
 	b.position = Vector2(next_x, 0.0)
 	add_child(b)
 	pieces.append(b)
-	anchors.append(Vector2(next_x + 14.0, roof))
-	anchors.append(Vector2(next_x + w - 14.0, roof))
+	_add_anchor(Vector2(next_x + 14.0, roof), _gooed(next_x))
+	_add_anchor(Vector2(next_x + w - 14.0, roof), _gooed(next_x))
 	if b.has_tower:
-		anchors.append(Vector2(next_x + w * 0.5, roof - 96.0))
+		_add_anchor(Vector2(next_x + w * 0.5, roof - 96.0), _gooed(next_x))
 	next_x += w + rng.randf_range(55.0, 150.0)
 
 
@@ -98,7 +137,7 @@ func _spawn_trestle() -> void:
 	pieces.append(t)
 	var x := next_x + 30.0
 	while x < next_x + span - 20.0:
-		anchors.append(Vector2(x, TRESTLE_DECK_Y - 26.0))
+		_add_anchor(Vector2(x, TRESTLE_DECK_Y - 26.0), _gooed(x))
 		x += 130.0
 	next_x += span + rng.randf_range(60.0, 130.0)
 

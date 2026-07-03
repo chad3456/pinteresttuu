@@ -19,8 +19,34 @@ Swing physics is a classic constrained pendulum: while attached your position
 is held to the rope circle and outward radial velocity is removed; a tangential
 "pump" adds swing energy, and releasing at the top of the upswing flings you.
 Webs are forgiving — the rope auto-shortens so an arc can never drag you into
-the pavement. Falling without a web is not forgiving. Score is distance;
+the pavement, a soft air cushion near the street buys you a beat to react, and
+if a villain cuts your web while you're still holding, a new one auto-fires.
+Falling without a web is not forgiving. Score is distance plus rescue bonuses;
 best run is saved locally.
+
+## Rescue MJ
+
+MJ waves for help from a rooftop (pink beacon). Swing within reach and she
+grabs on; carry her ~250 m to the glowing **green safe roof** to deliver her
+for a **+100 m bonus**. Take a villain hit while carrying and she's snatched —
+and if you fall with her aboard, the game-over screen will let you know
+exactly how she feels about it.
+
+## Villain levels
+
+The run rotates through three villain zones every 550 m, each with its own
+sky tint, intro banner, and hazard — then the cycle repeats faster:
+
+1. **THE VULTURE** — a winged silhouette shadows you from above. Hovering is
+   the telegraph; when the talons flare red, he dives, and the dive is what
+   cuts your web.
+2. **DOC OCK** — mechanical arms rise from the street on a rhythm, claws
+   snapping at swing height. Time your arcs between them.
+3. **VENOM** — black goo coats some anchors (webs won't stick — routes
+   shrink) while symbiote tendrils lash up from below, faster than Ock's arms.
+
+A villain hit never kills directly: it cuts your web and knocks you — losing
+MJ if she's aboard. The street does the rest if you don't recover.
 
 ## Queens, NYC
 

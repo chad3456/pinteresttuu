@@ -15,6 +15,8 @@ var attached := false
 var anchor := Vector2.ZERO
 var rope_len := 0.0
 var pose_angle := 0.0
+var invuln := 0.0
+var carrying := false   # MJ on board
 
 
 func reset(pos: Vector2) -> void:
@@ -22,7 +24,21 @@ func reset(pos: Vector2) -> void:
 	velocity = Vector2.ZERO
 	attached = false
 	pose_angle = 0.0
+	invuln = 0.0
+	carrying = false
 	queue_redraw()
+
+
+## Villain contact: cut the web, knock upward, brief mercy window.
+## Returns false if the hit was ignored (already invulnerable).
+func hit() -> bool:
+	if invuln > 0.0:
+		return false
+	invuln = 1.3
+	attached = false
+	velocity.x *= 0.6
+	velocity.y = -380.0
+	return true
 
 
 func attach(a: Vector2) -> void:
@@ -34,6 +50,7 @@ func attach(a: Vector2) -> void:
 	rope_len = minf(rope_len, maxf(150.0, floor_len))
 	attached = true
 	if velocity.length() < 220.0:
+		rope_len = minf(rope_len, 420.0)   # short first rope: quick, high arc
 		velocity += Vector2(340.0, -260.0)   # first leap off the roof
 
 
@@ -45,7 +62,12 @@ func release() -> void:
 
 
 func step(delta: float) -> void:
+	if invuln > 0.0:
+		invuln -= delta
 	velocity.y += GRAVITY * delta
+	# air cushion: webless falls slow down near the street — a beat to react
+	if not attached and position.y > 640.0 and velocity.y > 0.0:
+		velocity.y -= GRAVITY * 0.6 * delta
 	if attached:
 		var tangent := (position - anchor).orthogonal().normalized()
 		if tangent.dot(velocity) < 0.0:
@@ -73,10 +95,20 @@ func step(delta: float) -> void:
 
 
 func _draw() -> void:
+	if invuln > 0.0 and int(Time.get_ticks_msec() / 90) % 2 == 0:
+		return   # hit blink
 	var red := Color("c8232c")
 	var red_d := red.darkened(0.25)
 	var blue := Color("1f3a93")
 	draw_set_transform(Vector2.ZERO, pose_angle, Vector2.ONE)
+	# MJ riding along when carried
+	if carrying:
+		draw_rect(Rect2(-17.0, -12.0, 9.0, 15.0), Color("f0ece0"))
+		draw_rect(Rect2(-17.0, 2.0, 9.0, 10.0), Color("3a5da8"))
+		draw_circle(Vector2(-13.0, -17.0), 5.0, Color("e8cba6"))
+		draw_circle(Vector2(-14.0, -20.0), 5.5, Color("c9452c"))
+		draw_rect(Rect2(-20.0, -20.0, 4.0, 13.0), Color("c9452c"))
+		draw_line(Vector2(-12.0, -10.0), Vector2(0.0, -6.0), Color("e8cba6"), 3.0)
 	# trailing legs
 	var kick := clampf(velocity.length() / MAX_SPEED, 0.2, 1.0)
 	draw_line(Vector2(-2.0, 10.0), Vector2(-14.0 - 10.0 * kick, 30.0), blue, 7.0)
