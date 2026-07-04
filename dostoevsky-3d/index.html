@@ -147,6 +147,93 @@
 
   #nogl-note{display:none;position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;
     font-family:var(--label);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#7a715f}
+
+  /* ============ codex overlay (multi-click wing) ============ */
+  .codex-btn{display:inline-block;margin-top:24px;font-family:var(--label);font-size:11px;
+    letter-spacing:.34em;text-transform:uppercase;color:var(--candle);
+    border:1px solid rgba(232,180,90,.5);border-radius:999px;padding:11px 22px;transition:all .3s}
+  .codex-btn:hover{background:rgba(232,180,90,.12);border-color:var(--candle)}
+  #overlay{
+    position:fixed;inset:0;z-index:60;display:none;
+    background:rgba(8,6,5,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  #overlay.open{display:flex;align-items:stretch;justify-content:center}
+  #panel{
+    width:min(980px,100%);margin:3vh 14px;overflow-y:auto;overscroll-behavior:contain;
+    background:linear-gradient(#171310,#100d0a);
+    border:1px solid rgba(233,226,210,.16);box-shadow:0 40px 120px rgba(0,0,0,.8);
+    padding:54px clamp(22px,6vw,72px) 70px;scrollbar-width:thin;
+  }
+  #panel-close{position:sticky;top:0;float:right;z-index:5;
+    font-family:var(--label);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ivory-dim);border:1px solid rgba(233,226,210,.3);border-radius:999px;
+    padding:8px 18px;background:rgba(16,13,10,.85)}
+  #panel-close:hover{color:var(--candle);border-color:var(--candle)}
+  .cx-ru{font-family:var(--label);font-size:11px;letter-spacing:.6em;text-transform:uppercase;
+    color:var(--wax);margin-bottom:14px}
+  .cx-title{font-family:var(--display);font-weight:400;font-size:clamp(34px,5.6vw,62px);
+    line-height:1.02;letter-spacing:.02em;text-wrap:balance}
+  .cx-epi{font-style:italic;color:var(--ivory-dim);margin:16px 0 6px;max-width:56ch}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:34px 0 30px;border-bottom:1px solid rgba(233,226,210,.15);
+    padding-bottom:14px}
+  .tab{font-family:var(--label);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--ivory-dim);padding:9px 16px;border:1px solid transparent;border-radius:999px;transition:all .25s}
+  .tab:hover{color:var(--ivory)}
+  .tab.on{color:var(--candle);border-color:rgba(232,180,90,.5)}
+  .tabpane{display:none;animation:fadein .5s ease}
+  .tabpane.on{display:block}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+  .prose{max-width:64ch;font-size:16.5px;line-height:1.85;color:var(--ivory)}
+  .prose p{margin-bottom:18px}
+  .prose em{color:var(--ivory-dim)}
+  .prose .drop::first-letter{font-family:var(--display);font-size:3.4em;float:left;
+    line-height:.82;padding:4px 10px 0 0;color:var(--wax)}
+  .prose h4{font-family:var(--display);font-weight:400;font-size:22px;margin:26px 0 10px;color:var(--candle)}
+  .kv{font-family:var(--label);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ivory-dim);display:flex;gap:26px;flex-wrap:wrap;margin:8px 0 4px}
+  .kv b{color:var(--candle);font-weight:600}
+  .xlink{color:var(--candle);border-bottom:1px dotted rgba(232,180,90,.6);cursor:pointer}
+  .xlink:hover{border-bottom-style:solid}
+
+  /* character grid inside codex + atlas */
+  .char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:8px}
+  .char-tile{text-align:left;padding:20px 18px;border:1px solid rgba(233,226,210,.16);
+    background:rgba(233,226,210,.03);transition:all .25s;cursor:pointer}
+  .char-tile:hover{border-color:rgba(232,180,90,.55);background:rgba(232,180,90,.06);transform:translateY(-2px)}
+  .char-tile .cn{font-family:var(--display);font-size:20px;line-height:1.1}
+  .char-tile .cr{font-family:var(--label);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ivory-dim);margin-top:8px}
+  .char-tile .cq{font-style:italic;font-size:13px;color:var(--wax);margin-top:10px}
+
+  /* philosophy accordions */
+  .phi-item{border-top:1px solid rgba(233,226,210,.15)}
+  .phi-item:last-child{border-bottom:1px solid rgba(233,226,210,.15)}
+  .phi-head{width:100%;display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    padding:26px 4px;text-align:left}
+  .phi-head .pt{font-family:var(--display);font-weight:400;font-size:clamp(22px,3.4vw,32px)}
+  .phi-head .pn{font-family:var(--label);font-size:10px;letter-spacing:.3em;color:var(--wax)}
+  .phi-head:hover .pt{color:var(--candle)}
+  .phi-body{max-height:0;overflow:hidden;transition:max-height .8s ease,opacity .6s ease;opacity:0}
+  .phi-item.open .phi-body{max-height:700px;opacity:1}
+  .phi-body .prose{padding:0 4px 30px}
+
+  /* gutenberg reader */
+  .reader-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px;
+    font-family:var(--label);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ivory-dim)}
+  .reader-bar button{border:1px solid rgba(233,226,210,.3);border-radius:999px;padding:8px 18px;
+    letter-spacing:.24em;font-size:10.5px;text-transform:uppercase;color:var(--ivory)}
+  .reader-bar button:hover:not(:disabled){color:var(--candle);border-color:var(--candle)}
+  .reader-bar button:disabled{opacity:.35;cursor:default}
+  .reader-page{
+    background:#ded2b4;color:#241d13;padding:clamp(26px,5vw,54px);
+    font-size:16px;line-height:1.9;box-shadow:0 24px 60px rgba(0,0,0,.6);
+    white-space:pre-wrap;font-family:var(--body);min-height:300px;
+  }
+  .reader-note{font-family:var(--label);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--ivory-dim);margin-top:14px;line-height:2}
+  .reader-note a{color:var(--candle);border-bottom:1px dotted var(--candle)}
+  .loading-candle{display:inline-block;animation:pulse-c 1.1s ease-in-out infinite}
+  @keyframes pulse-c{0%,100%{opacity:.4}50%{opacity:1}}
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01s!important;animation-duration:.01s!important;scroll-behavior:auto}
     .rise{opacity:1;transform:none}
@@ -166,9 +253,10 @@
   <a class="mark" href="#hero"><span class="fd">ФД</span><span>DOSTOEVSKY</span></a>
   <div class="navlinks">
     <a href="#books">The Novels</a>
+    <a href="#/atlas" class="hashlink">Atlas of Souls</a>
+    <a href="#/philosophy" class="hashlink">Philosophy</a>
     <a href="#nights">White Nights</a>
-    <a href="#author">The Author</a>
-    <a class="visit" href="#visit">Read</a>
+    <a class="visit" href="#/codex/karamazov">Open a Codex</a>
   </div>
 </nav>
 
@@ -201,6 +289,7 @@
         <div class="book-year">1866 · St. Petersburg in July</div>
         <p class="book-line">One theory, two lives, and a city too hot to think in. A student commits the perfect argument — then spends five hundred pages losing it to his own pulse.</p>
         <p class="book-quote">"Pain and suffering are always inevitable for a large intelligence and a deep heart."</p>
+        <a class="codex-btn hashlink" href="#/codex/crime">Open the codex →</a>
       </div>
     </article>
 
@@ -211,6 +300,7 @@
         <div class="book-year">1864 · a mouse-hole under the century</div>
         <p class="book-line">Forty pages of a man arguing with progress itself — and winning, ugly. The first modern voice: too aware to act, too proud to stop talking.</p>
         <p class="book-quote">"I am a sick man… I am a spiteful man."</p>
+        <a class="codex-btn hashlink" href="#/codex/underground">Open the codex →</a>
       </div>
     </article>
 
@@ -221,6 +311,7 @@
         <div class="book-year">1869 · drawing rooms with knives out</div>
         <p class="book-line">A perfectly good man returns to society. Society survives — barely. Goodness, it turns out, is the most disruptive technology of all.</p>
         <p class="book-quote">"Beauty will save the world."</p>
+        <a class="codex-btn hashlink" href="#/codex/idiot">Open the codex →</a>
       </div>
     </article>
 
@@ -231,6 +322,7 @@
         <div class="book-year">1880 · the final ledger</div>
         <p class="book-line">Three brothers, one dreadful father, and the oldest question asked with knives on the table. Finished three months before his death; unfinished in every reader since.</p>
         <p class="book-quote">"Above all, don't lie to yourself."</p>
+        <a class="codex-btn hashlink" href="#/codex/karamazov">Open the codex →</a>
       </div>
     </article>
   </section>
@@ -272,6 +364,383 @@
   </section>
 </main>
 
+  <div id="overlay" role="dialog" aria-modal="true">
+    <div id="panel">
+      <button id="panel-close">✕ Close</button>
+      <div id="panel-content"></div>
+    </div>
+  </div>
+
+
+<script>
+/* ============ THE CODEX — original commentary, atlas & Gutenberg reader ============ */
+(function(){
+"use strict";
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+
+/* ---------- original essays (written for this site) ---------- */
+var CODEX={
+ crime:{
+  ru:"Преступление и наказание · 1866",
+  title:"Crime and Punishment",
+  epi:"A theory walks into a pawnbroker's flat. A man walks out.",
+  gid:2554,
+  chars:["rask","sonya","porfiry"],
+  overview:[
+   "Petersburg in July: heat, debt, and a student who has stopped eating but not thinking. Raskolnikov has published a theory — that a few extraordinary men have the right to step over the moral law if history profits — and the novel is simply that theory leaving the page and entering a stairwell with an axe.",
+   "Notice the architecture: the crime is finished within the first act. Everything after is the punishment — and it arrives long before the police do. It comes as fever, as the inability to touch his own family, as a body that confesses in symptoms while the mouth still argues. Dostoevsky's radical claim is procedural: conscience is not enforced by courts. It is enforced by physiology.",
+   "The city itself is an accomplice — yellow wallpaper, coffin-sized rooms, staircases that behave like moral diagrams. Nobody thinks clearly in a room where they cannot stand up straight, and Dostoevsky knows it: poverty here is not backdrop but pressure, the atmosphere in which ideas catch fire faster than they can be inspected."
+  ],
+  commentary:[
+   "The deep engine of the book is arithmetic. Raskolnikov's plan is a sum: one malicious life subtracted, a thousand good deeds financed. What breaks him is the remainder his equation never budgeted — Lizaveta, the meek sister who walks in mid-theorem and must also die. Every ideology in Dostoevsky meets its Lizaveta: the unplanned second victim is his signature argument against moral bookkeeping.",
+   "Porfiry Petrovich deserves his reputation as the first modern detective, but look closer at what he actually investigates: not evidence — he has almost none — but a soul's timetable. His method is to do nothing, warmly, in your presence, until your own guilt finishes the paperwork. Every television detective who wins by chatting owes him royalties.",
+   "The scene to reread is Sonya reading the raising of Lazarus aloud: a murderer and a prostitute bent over one candle and one book. Dostoevsky sets the two 'fallen' people of the novel over the one story about getting up. And the epilogue's sudden dawn, which critics have called unearned for 150 years — perhaps that is the point. Grace, in this book, is precisely what cannot be earned; it arrives as a non sequitur, because for Dostoevsky it always does."
+  ],
+  question:[
+   "Is conscience a social convention — trainable, negotiable, refundable — or an organ, as factual as a lung? Raskolnikov bets his life on the first answer and his body votes for the second.",
+   "The novel's question for you is not 'would you kill the pawnbroker.' It is quieter and worse: which of your own permissions rest on arithmetic — and who is the Lizaveta your sums have not yet met?"
+  ]
+ },
+ underground:{
+  ru:"Записки из подполья · 1864",
+  title:"Notes from Underground",
+  epi:"Forty pages of a man arguing with the century — and winning, ugly.",
+  gid:600,
+  chars:["undergroundman"],
+  overview:[
+   "There is no plot to spoil, because the narrator is the plot: a retired clerk in a hole under Petersburg, talking — to us, at us, against us — for forty years of accumulated spite. Part one is his war on the great optimism of his age: the idea that once men know their rational advantage, they will behave. Part two shows the receipts from his one attempt at contact with another human being.",
+   "The book is the seed crystal of modern literature. Every unreliable narrator, every antihero who knows better and does worse, every voice that performs its own diagnosis — they all descend from this mouse-hole.",
+   "Read it as a rebuttal written in the first person plural of the whole coming century: against utopias, against crystal palaces, against any system that promises to make men happy by making their choices for them."
+  ],
+  commentary:[
+   "The standard summary calls him a nihilist. He is the opposite — a romantic in withdrawal. He owns the complete works of the sublime and beautiful; his cruelty is what idealism does when it discovers the world will not sit for its portrait. When he humiliates Liza — the one person who offers him unscripted tenderness — he is performing part one's essay on a human body: proving he is free by wrecking the only good thing in the room.",
+   "His central claim is the most quoted and least digested idea in Dostoevsky: that man will act against his own advantage, knowingly, deliberately — will choose suffering, chaos, even ruin — solely to prove the ledger doesn't own him. Twice two is four, he concedes; but twice two is four is the beginning of death. A creature fully explained is a creature abolished.",
+   "And yet watch the trap Dostoevsky builds under his own narrator: spite is not freedom. A man who must always do the opposite of what reason recommends is still taking orders from reason — inverted. The underground is not liberty; it is the cheapest available imitation of it. That double edge, missed by half his fans, is the whole blade."
+  ],
+  question:[
+   "Would you accept guaranteed happiness — full, verified, permanent — if the price was the right to refuse it? Answer quickly and you haven't understood the question.",
+   "The twentieth century ran the experiment at scale, several times. The underground man read the grant proposals first, and declined, in advance."
+  ]
+ },
+ idiot:{
+  ru:"Идиот · 1869",
+  title:"The Idiot",
+  epi:"An experiment: one genuinely good man, released into society. Society survives. Barely.",
+  gid:2638,
+  chars:["myshkin","nastasya","rogozhin"],
+  overview:[
+   "Dostoevsky set himself the hardest design problem in fiction: depict a positively beautiful man — Christ-like, but with no authority, no miracles, no institution — and drop him into Petersburg's economy of money, vanity and marriageable daughters. Prince Myshkin arrives from a Swiss clinic with an open face, an inheritance, and no armor whatsoever.",
+   "What follows is slow-motion breakage. Not because goodness is weak — Myshkin is never weak — but because his compassion refuses to triage. He cannot love one person at the expense of another, and society runs entirely on that expense.",
+   "Around him orbit the two great wounded: Nastasya Filippovna, brilliance ruined into weaponized shame, and Rogozhin, passion that cannot tell holding from destroying. The prince stands between them like a man trying to catch two falling objects with the same pair of hands."
+  ],
+  commentary:[
+   "Nastasya is the test that goodness fails, and the failure is precise: she does not need to be forgiven — she needs to be chosen. Myshkin offers her infinite pity, and pity, to a woman whose whole wound is being treated as an object of transactions, is just the kindest available insult. The novel understands something rare: compassion without desire can humiliate.",
+   "Myshkin and Rogozhin are one soul cut in half — the book says so in gestures. They exchange crosses like brothers; hours later one waits on a staircase with a knife. And at the end, the two of them keep vigil together through the night on either side of what their shared love destroyed — the strangest and most tender pietà in literature. Dostoevsky's geometry: absolute light and absolute dark are closer to each other than either is to the lukewarm middle.",
+   "The epileptic aura — that one second of total harmony the prince says is worth a whole life — is Dostoevsky auditing his own illness for metaphysical revenue. He gives his disease to his best character and asks: if a defective brain briefly touches heaven, does the defect disprove the heaven? The novel declines to answer, which is the answer."
+  ],
+  question:[
+   "Can undefended goodness exist among people without becoming a catastrophe for exactly those it loves? The novel's answer is no — and it lays the fault at society's door, not the prince's.",
+   "The question underneath: when you meet an innocence that shames you, do you protect it, or do you — quietly, respectably, in company — help take it apart?"
+  ]
+ },
+ karamazov:{
+  ru:"Братья Карамазовы · 1880",
+  title:"The Brothers Karamazov",
+  epi:"Three brothers, one dreadful father, and the oldest question asked with knives on the table.",
+  gid:28054,
+  chars:["ivan","alyosha","dmitri","smerdyakov","zosima"],
+  overview:[
+   "A father is murdered, and a country is diagnosed. Fyodor Pavlovich Karamazov — sensualist, buffoon, landlord of his own moral swamp — has three legitimate sons and, in the kitchen, one unacknowledged fourth. The novel arranges them like faculties of a single Russian soul: Dmitri the body, Ivan the mind, Alyosha the heart. And Smerdyakov, the disowned conclusion, listening from the stairs.",
+   "Finished three months before Dostoevsky's death, it is his final ledger: every theme he ever ran — God, freedom, guilt, the tears of children — returns for settlement.",
+   "At the center stands the Grand Inquisitor, Ivan's prose poem: Christ returns and is arrested by his own church, which has traded freedom for bread on humanity's behalf, out of mercy. It may be the strongest argument for atheism in literature — written by a believer, on purpose."
+  ],
+  commentary:[
+   "The subtlety everyone misses: Ivan does not argue that God doesn't exist. He does something more dangerous — he accepts the whole design and returns the ticket. If universal harmony is priced in even one tortured child, he says, the price is indecent regardless of who set it. It is not disbelief; it is a refusal of terms. And Dostoevsky answers it with no argument at all — with a kiss, twice: Christ kisses the Inquisitor, Alyosha kisses Ivan. His thesis, stated in gesture: some questions are too serious for rebuttal; they can only be outlived, together.",
+   "Smerdyakov is Ivan's philosophy with legs. 'If there is no God, everything is permitted' — Ivan owns the idea like furniture; Smerdyakov, whom nobody taught the unwritten exceptions, executes it as instructions. The horror of their last interview is a man meeting his own syllogism and discovering it has done the dishes and the murder. Ideas, in this book, are not possessions. They are tenants who change the locks.",
+   "Zosima's teaching — that each of us is guilty before all, for everyone and everything — reads as mysticism and works as engineering. Only universal responsibility makes love non-optional; any smaller jurisdiction lets everyone outsource the dying child to someone else's conscience. And note the devil Ivan finally meets: not majestic, but a shabby gentleman in last decade's fashion, full of borrowed opinions. Dostoevsky's finding, decades early: evil is not grandeur. Evil is plagiarism."
+  ],
+  question:[
+   "If God exists, why does a child suffer? If He does not, who exactly forbids the torturer? The novel opens both doors, shows you both rooms on fire, and locks you in the house with three brothers who each grabbed a different extinguisher.",
+   "Its last word is not an answer but an instruction — spoken at a funeral, to boys, about a boy: remember. Memory of one good moment, Alyosha says, may one day keep us from the worst. The whole cathedral of the book rests on that pebble."
+  ]
+ }
+};
+
+var CHARS={
+ rask:{n:"Rodion Raskolnikov",b:"crime",r:"The theorist · Crime and Punishment",
+  want:"To be extraordinary — retroactively",wound:"A mind that outran its own conscience and had to walk back alone",
+  q:"He committed a murder to test a theory. The theory failed the practical.",
+  e:["Raskolnikov is not evil; he is worse — plausible. Half-starved, gifted, humiliated by poverty, he does what gifted humiliated men do: he builds a theory in which his humiliation is a misfiled greatness. The Napoleon test — great men step over — is less a philosophy than a loan application, and the axe is his signature.",
+     "Dostoevsky's masterstroke is where the punishment lands: not in courtrooms but in the nervous system. Raskolnikov discovers he cannot embrace his mother, cannot hold his sister's eyes, cannot cross a bridge without the city tilting. He wanted to be beyond mankind and finds himself, precisely, outside it — and outside, it turns out, is not above.",
+     "His salvation, when it comes, is not intellectual. He never refutes his own article; he simply meets a person — Sonya — whose existence the article cannot explain. In Dostoevsky, no one is argued back to life. They are accompanied back."]},
+ sonya:{n:"Sonya Marmeladova",b:"crime",r:"The counter-argument · Crime and Punishment",
+  want:"To save without judging",wound:"Sold her own dignity so a family could eat — and kept her soul anyway",
+  q:"Meekness so complete it functions as a verdict.",
+  e:["Sonya is the answer to Raskolnikov's arithmetic, and she answers in the only currency his equations cannot process: unaccountable giving. She has committed, by the world's ledger, a worse trespass than he has — and carries no theory to launder it. That is exactly her authority.",
+     "Readers mistake her for passive. Watch what she actually does: she follows a murderer to Siberia, without illusion, without reward, without ever once agreeing that what he did was permitted. Her meekness has a spine of granite — she forgives everything and excuses nothing, a distinction on which the whole novel balances.",
+     "When she reads Lazarus aloud to him, Dostoevsky lights the scene like an altar: the two most disgraced people in Petersburg, one candle, one story about a dead man walking out. She is not a symbol of religion. She is what the book thinks religion is for."]},
+ porfiry:{n:"Porfiry Petrovich",b:"crime",r:"The examiner · Crime and Punishment",
+  want:"A confession, freely given — he insists on the 'freely'",wound:"Knows souls too well to respect evidence",
+  q:"The first detective to solve a man instead of a case.",
+  e:["Porfiry has no witnesses, no fingerprints, and no doubt. His entire case is psychological weather: he invites Raskolnikov to tea, wanders, giggles, apologizes, circles — and lets the man's own guilt do the clerical work. Every rumpled television detective who wins by seeming harmless is quoting him.",
+     "His genius is patience weaponized: he tells Raskolnikov, in effect, 'you will come to me, because you cannot live where you are standing.' He treats confession not as capture but as first aid — offering, within the machinery of the law, a strange mercy: fall now, on purpose, and the fall will be survivable.",
+     "He is also Dostoevsky's joke on the century's faith in evidence: the age wanted justice made scientific, and its best investigator works like a confessor."]},
+ undergroundman:{n:"The Underground Man",b:"underground",r:"The voice · Notes from Underground",
+  want:"To be unpredictable — even to himself",wound:"Consciousness past the dose where it stops being a light and becomes a cage",
+  q:"The first modernist, the first troll, the first man to review his own soul and leave one star.",
+  e:["He is what happens when intelligence has no employment but self-observation. Too aware to act, too proud to join, he converts every impulse into commentary and every commentary into a small defeat. His forty-year sulk is a laboratory: what does freedom look like when it has nothing left to be free for? Answer: spite — freedom's last, cheapest proof.",
+     "His case against the rational utopians is genuinely unanswered to this day: build the perfect system, price every desire, and a man will smash it just to sign his name somewhere. But Dostoevsky builds a second floor under the first: spite is still obedience, inverted. A man compelled to contradict is exactly as unfree as a man compelled to comply.",
+     "The Liza episode is the book's cruelest mirror: offered one unscripted tenderness, he destroys it — because being loved would obligate him to exist in earnest. He is the patron saint of everyone who ever chose being right over being reached."]},
+ myshkin:{n:"Prince Lev Myshkin",b:"idiot",r:"The experiment · The Idiot",
+  want:"To love everyone — particularly, not generally",wound:"No armor: the world bills compassion as a choice against someone",
+  q:"Goodness without defenses, released into a market economy.",
+  e:["Myshkin is called an idiot because he does in public what others barely manage in private: he tells the truth, gently, to everyone, immediately. Society's immune system identifies this within minutes. He is not naive — he reads people with frightening accuracy — he simply declines to use what he reads as leverage.",
+     "His tragedy is structural, not moral. Placed between Nastasya's wound and Aglaya's pride, he cannot perform the one operation society demands: choosing one love at the price of another. Compassion that refuses triage looks, from outside, like betrayal of everyone at once.",
+     "Dostoevsky's experiment returns a terrible result: the world does not crucify the good man out of hatred. It dismantles him out of embarrassment — his existence raises everyone's self-contempt past the tolerable dose."]},
+ nastasya:{n:"Nastasya Filippovna",b:"idiot",r:"The wound · The Idiot",
+  want:"To be chosen — not pardoned, not purchased, chosen",wound:"Groomed into an ornament, then blamed for the fingerprints",
+  q:"She burns money to price the men who priced her.",
+  e:["Nastasya was made into property as a girl and has spent adulthood making the transaction visible: if society insists she is a commodity, she will conduct herself as one — at auction, loudly, wrecking every bidder's evening. Her scandal is a form of accuracy.",
+     "The famous scene — a fortune in banknotes thrown into the fire while the room watches, sweating — is her whole philosophy in one gesture: watch what your gods do in an emergency. She is the novel's most intelligent character, and her intelligence has exactly one flaw: she agrees with her accusers. The shame was installed young, and even Myshkin's clean gaze cannot reach the switch.",
+     "Between the prince's pity and Rogozhin's hunger she chooses, finally, the knife she can predict over the mercy she cannot believe. Dostoevsky writes no colder sentence about what early damage does: it makes destruction feel like the only honest suitor."]},
+ rogozhin:{n:"Parfyon Rogozhin",b:"idiot",r:"The hunger · The Idiot",
+  want:"To possess what can only be given",wound:"A love with no idiom but seizure",
+  q:"Passion that cannot tell holding from destroying.",
+  e:["Rogozhin inherits a merchant fortune and spends it like a wound: all of it aimed at one woman who will not be owned. His house tells you everything — dark, airless, ancestral, an icon glowing in the gloom: a soul with one lamp lit and all other rooms shuttered.",
+     "He is Myshkin's double, and the book insists on it: they read each other instantly, exchange crosses like brothers, and are last seen keeping vigil together over the ruin their shared love became. Absolute possession and absolute renunciation, Dostoevsky suggests, are the same passion wearing different coats — and the lukewarm middle understands neither.",
+     "He is not a villain. He is desire before it learns language — and the novel's warning is that such desire, denied the word 'yes,' will settle for the word 'mine,' and then for silence."]},
+ ivan:{n:"Ivan Karamazov",b:"karamazov",r:"The mind · The Brothers Karamazov",
+  want:"Justice — retroactive, universal, itemized",wound:"Cannot unknow; cannot uncare; cannot combine the two",
+  q:"He accepts God and returns the ticket.",
+  e:["Ivan is the intellect at maximum honesty, which turns out to be maximum pain. His rebellion is not atheism — it is a refusal of terms: if the harmony of heaven is financed by one child's unavenged tears, then the accounting is obscene even if the accountant is God. He does not deny the architect. He declines the building.",
+     "The Grand Inquisitor is his masterpiece and his confession: a church that loves mankind too much to leave it free. Ivan despises the Inquisitor and understands him perfectly — which is the problem. Understanding evil perfectly is a lease with an option to buy.",
+     "His breakdown is the most rigorous in fiction: the devil he hallucinates is not grand but shabby, secondhand, full of Ivan's own recycled phrases. A mind that believed only in itself finally meets itself — and finds the company unbearable. His fever is the tuition for the course Smerdyakov merely audited."]},
+ alyosha:{n:"Alyosha Karamazov",b:"karamazov",r:"The heart · The Brothers Karamazov",
+  want:"To be present — which turns out to be a full-time occupation",wound:"Loves a family that treats love as a delivery service",
+  q:"His miracle is attention.",
+  e:["Alyosha performs no wonders, wins no arguments, and is the hero anyway. Dostoevsky's wager on him is precise: that presence outlasts syllogisms. Every character in the novel summons him — to confess, to rage, to be watched while breaking — because he is the only person in the book who listens without preparing a reply.",
+     "He answers the strongest atheist argument ever written not with theology but with a kiss on his brother's mouth — Christ's own gesture from Ivan's poem, returned to sender. It is not evasion. It is the book's thesis: some propositions can only be answered by a body staying in the room.",
+     "His last scene — a speech to boys at a schoolmate's funeral, about keeping one good memory as insurance against the worst in ourselves — is deliberately small. After eight hundred pages of God, murder and philosophy, Dostoevsky rests his cathedral on a pebble: remember, and be kind, and that may be enough machinery for a life."]},
+ dmitri:{n:"Dmitri Karamazov",b:"karamazov",r:"The body · The Brothers Karamazov",
+  want:"To be honorable five minutes from now",wound:"His father's blood in his pulse and his mother's God in his shame",
+  q:"A battlefield with a heart rate.",
+  e:["Dmitri is appetite with a code of honor it keeps failing to reach — a man who can rhapsodize about beauty while pawning his fiancée's trust to fund a bacchanal, and mean both sincerely, within the hour. In him Dostoevsky stages his great anthropology: the human heart as contested ground where degradation and grandeur hold simultaneous title.",
+     "He is convicted of the one Karamazov crime he did not commit — and accepts the sentence as roughly accurate anyway: not guilty of the deed, guilty of the wish, and a man of honor pays for wishes. His 'hymn from underground' — the resolve to become new in chains — is conversion in the only key Dmitri can sing: loud, physical, half-mad, entirely real.",
+     "Of the three brothers, he is the least intelligent and the most alive, and the novel quietly suggests these facts are related."]},
+ smerdyakov:{n:"Pavel Smerdyakov",b:"karamazov",r:"The conclusion · The Brothers Karamazov",
+  want:"Acknowledgment — then, failing that, application",wound:"The family's sin, raised in the kitchen and taught its logic through the door",
+  q:"A syllogism with legs.",
+  e:["Smerdyakov is the fourth brother nobody claims: the product of the father's ugliest act, employed as his cook, educated by overhearing Ivan's philosophy through the wall. He is what a great idea becomes in a man given the theory but not the tenderness — 'everything is permitted' received not as anguish but as instructions.",
+     "His last interview with Ivan is the novel's true horror scene, no blood required: he explains, patiently, like a clerk reviewing an order, that Ivan authorized the murder by leaving — that ideas are deeds with a delivery delay. Ivan meets his own syllogism, and it has done the dishes and the killing.",
+     "Dostoevsky's coldest insight lives here: cruelty flows downhill through households, and philosophy is not exempt from gravity. The educated man's abstraction becomes the humiliated man's alibi — and both signatures end up on the same document."]},
+ zosima:{n:"Elder Zosima",b:"karamazov",r:"The teacher · The Brothers Karamazov",
+  want:"To send love out of the monastery and into the mud",wound:"A duelist's youth he never quite finished repenting — by design",
+  q:"Guilt universalized until it becomes tenderness.",
+  e:["Zosima's teaching sounds mystical and works like engineering: hold yourself guilty before all, for everyone and everything — because any smaller jurisdiction lets every conscience outsource the dying child next door. Universal responsibility is not sentiment; it is the only incentive structure under which love stops being optional.",
+     "He refuses to let Alyosha hide in the monastery — sends him into the world, into the family, into the mess — because in his economy sanctity is not a location. And when his corpse decays like any other body, scandalizing the town that expected a miracle, the novel makes its point with a smell: holiness offers no exemptions, only examples.",
+     "His distinction between love in dreams (quick, heroic, applauded) and love in action (slow, unglamorous, mostly laundry) may be the most practically useful sentence Dostoevsky ever wrote down."]}
+};
+
+var PHIL=[
+ {t:"Freedom — the unbearable gift",n:"I",
+  e:["Every other novelist of his century asked how men could be made happy. Dostoevsky asked whether they could stand being free — and answered: barely, and not for long, and they will pay any bread-price to be relieved of it. The Grand Inquisitor's case is exactly this: mankind begs to hand freedom back.",
+     "But the underground has the same finding from the other side: give a man paradise with the choices pre-made, and he will smash something just to sign his name. Freedom, in Dostoevsky, is measured by one thing only — what it is still permitted to refuse. A choice that cannot say no is a mechanism; a man who cannot say no is a part."],
+  x:[["The Grand Inquisitor","#/codex/karamazov"],["The Underground Man","#/atlas/undergroundman"]]},
+ {t:"Suffering — audited, not worshipped",n:"II",
+  e:["The lazy reading says Dostoevsky glorifies suffering. He does something stranger: he audits it. Suffering in his books is informative — it wakes consciousness the way frostbite wakes skin — but it sanctifies nothing by itself. Fyodor Karamazov suffers and becomes only more Fyodor.",
+     "The real doctrine is narrower and harder: suffering is the one message that cannot be delegated. Raskolnikov's fever, Dmitri's chains, Ivan's devil — each is a bill that arrives addressed personally, after every theory promised to split it. What you do with the invoice — Sonya's company or the underground's spite — is the entire moral life."],
+  x:[["Raskolnikov","#/atlas/rask"],["Dmitri","#/atlas/dmitri"]]},
+ {t:"God & doubt — the crucible clause",n:"III",
+  e:["Dostoevsky wrote the strongest atheist argument in literature and put his own faith on the far side of it, on purpose. He said of himself that his hosanna had passed through a great furnace of doubt — and he built the furnace into every book: no character believes cheaply and stays believable.",
+     "Ivan and Alyosha are not opponents; they are one argument holding both its ends. The novel's finding is that the question of God is not settled by proofs in either direction — it is settled, provisionally, daily, by what a person does at a bedside, at a funeral, in a kitchen. Belief, here, is not an opinion. It is a posture under load."],
+  x:[["Ivan","#/atlas/ivan"],["Alyosha","#/atlas/alyosha"]]},
+ {t:"The idea as infection",n:"IV",
+  e:["In Dostoevsky, characters do not have ideas. Ideas have them. A theory enters a mind the way a fever enters a body — incubates, spikes, and issues instructions. Raskolnikov's article picks up an axe; Ivan's syllogism, overheard through a kitchen wall, commits a murder while its author is out of town.",
+     "This is his darkest discovery and his most modern one: an idea is complete only when it finds the person with nothing to lose by executing it. The intellectual signs the theory; someone lower on the staircase signs the deed. Every ideology of the century that followed him ran this exact supply chain, at scale."],
+  x:[["Smerdyakov","#/atlas/smerdyakov"],["Crime and Punishment","#/codex/crime"]]},
+ {t:"Love as practice",n:"V",
+  e:["Against all his abysses, Dostoevsky's positive teaching is almost embarrassingly small: attention. Love in dreams — heroic, immediate, publicly admired — he distrusts on sight. Love in action is slow, dull, specific, and mostly consists of staying in the room: Sonya in Siberia, Alyosha at the bedside, a kiss instead of a rebuttal.",
+     "The atomic act of morality in his books is not sacrifice but presence — a person choosing to keep looking at another person when looking away is free. Everything cathedral-sized in Dostoevsky rests on that gesture, repeated."],
+  x:[["Sonya","#/atlas/sonya"],["Zosima","#/atlas/zosima"]]},
+ {t:"The double — the self as committee",n:"VI",
+  e:["Nobody in Dostoevsky is one person. Ivan has Smerdyakov, Myshkin has Rogozhin, Raskolnikov has Svidrigailov — each hero trails a shadow who performs what the hero only permits himself to think. The double is not a gothic prop; it is his psychology: the self as a committee that has stopped holding meetings.",
+     "Which is why confession is the great sacrament of his fiction — not because it informs God, who presumably knew, but because it is the only procedure that reconvenes the committee. The man who says the thing aloud, before a witness, becomes one person again. Every plot he wrote bends toward somebody finally saying it aloud."],
+  x:[["Myshkin & Rogozhin","#/codex/idiot"],["Porfiry","#/atlas/porfiry"]]}
+];
+
+/* ---------- render helpers ---------- */
+function paras(a){return a.map(function(p,i){return '<p class="'+(i===0?'drop':'')+'">'+p+'</p>'}).join('')}
+function charTile(id){
+  var c=CHARS[id];
+  return '<button class="char-tile hashbtn" data-hash="#/atlas/'+id+'">'+
+    '<div class="cn">'+c.n+'</div><div class="cr">'+c.r+'</div><div class="cq">'+c.q+'</div></button>';
+}
+function renderCodex(slug){
+  var b=CODEX[slug];if(!b)return renderAtlas();
+  return '<div class="cx-ru">'+b.ru+'</div>'+
+  '<h2 class="cx-title">'+b.title+'</h2>'+
+  '<p class="cx-epi">'+b.epi+'</p>'+
+  '<div class="tabs" role="tablist">'+
+    ['Overview','Commentary','The Question','Souls','Read the Book'].map(function(t,i){
+      return '<button class="tab'+(i===0?' on':'')+'" data-tab="'+i+'">'+t+'</button>'}).join('')+
+  '</div>'+
+  '<div class="tabpane on" data-pane="0"><div class="prose">'+paras(b.overview)+'</div></div>'+
+  '<div class="tabpane" data-pane="1"><div class="prose">'+paras(b.commentary)+'</div></div>'+
+  '<div class="tabpane" data-pane="2"><div class="prose">'+paras(b.question)+'</div></div>'+
+  '<div class="tabpane" data-pane="3"><div class="char-grid">'+b.chars.map(charTile).join('')+'</div></div>'+
+  '<div class="tabpane" data-pane="4">'+
+    '<div class="reader-bar">'+
+      '<button data-rd="first">⇤</button><button data-rd="prev">← Prev</button>'+
+      '<span id="rd-pos">—</span>'+
+      '<button data-rd="next">Next →</button><button data-rd="last">⇥</button>'+
+    '</div>'+
+    '<div class="reader-page" id="rd-page"><span class="loading-candle">🕯 fetching the full text from Project Gutenberg…</span></div>'+
+    '<p class="reader-note">Complete public-domain text (Constance Garnett translation) · streamed live from '+
+    '<a href="https://www.gutenberg.org/ebooks/'+b.gid+'" target="_blank" rel="noopener">gutenberg.org ↗</a> · your place is remembered</p>'+
+  '</div>';
+}
+function renderChar(id){
+  var c=CHARS[id];if(!c)return renderAtlas();
+  var b=CODEX[c.b];
+  return '<div class="cx-ru">Атлас душ · '+c.r+'</div>'+
+  '<h2 class="cx-title">'+c.n+'</h2>'+
+  '<p class="cx-epi">'+c.q+'</p>'+
+  '<div class="kv"><span>Wants — <b>'+c.want+'</b></span><span>Wound — <b>'+c.wound+'</b></span></div>'+
+  '<div style="height:22px"></div><div class="prose">'+paras(c.e)+'</div>'+
+  '<div style="height:26px"></div>'+
+  '<span class="xlink hashbtn" data-hash="#/codex/'+c.b+'">← Open the codex of '+b.title+'</span>'+
+  '&nbsp;&nbsp;&nbsp;<span class="xlink hashbtn" data-hash="#/atlas">All souls</span>';
+}
+function renderAtlas(){
+  return '<div class="cx-ru">Атлас душ</div>'+
+  '<h2 class="cx-title">Atlas of Souls</h2>'+
+  '<p class="cx-epi">Twelve people who never existed and refuse to stop existing. Click any soul for its dossier.</p>'+
+  '<div style="height:24px"></div>'+
+  '<div class="char-grid">'+Object.keys(CHARS).map(charTile).join('')+'</div>';
+}
+function renderPhil(){
+  return '<div class="cx-ru">Философия человека</div>'+
+  '<h2 class="cx-title">The Philosophy of Man</h2>'+
+  '<p class="cx-epi">Six load-bearing beams under everything he wrote. Open each; follow the cross-references into the books and the souls.</p>'+
+  '<div style="height:26px"></div>'+
+  PHIL.map(function(p,i){
+    return '<div class="phi-item" data-phi="'+i+'">'+
+      '<button class="phi-head"><span class="pt">'+p.t+'</span><span class="pn">'+p.n+'</span></button>'+
+      '<div class="phi-body"><div class="prose">'+paras(p.e)+
+      '<p>'+p.x.map(function(x){return '<span class="xlink hashbtn" data-hash="'+x[1]+'">'+x[0]+' →</span>'}).join('&nbsp;&nbsp;&nbsp;')+'</p>'+
+      '</div></div></div>';
+  }).join('');
+}
+
+/* ---------- gutenberg reader ---------- */
+var CACHE={};
+function loadBook(slug){
+  var b=CODEX[slug],page=$("#rd-page"),pos=$("#rd-pos");
+  if(!page)return;
+  function show(){
+    var st=CACHE[slug];
+    var key="dread-"+slug;
+    var i=Math.min(st.pages.length-1,parseInt(localStorage.getItem(key)||"0",10));
+    function draw(){
+      page.textContent=st.pages[i];
+      pos.textContent="page "+(i+1)+" of "+st.pages.length;
+      localStorage.setItem(key,i);
+      page.scrollTop=0;
+    }
+    $("#panel").querySelectorAll("[data-rd]").forEach(function(btn){
+      btn.onclick=function(){
+        var k=btn.getAttribute("data-rd");
+        if(k==="first")i=0;else if(k==="last")i=st.pages.length-1;
+        else if(k==="prev")i=Math.max(0,i-1);else i=Math.min(st.pages.length-1,i+1);
+        draw();
+      };
+    });
+    draw();
+  }
+  if(CACHE[slug]){show();return}
+  var urls=[
+    "https://www.gutenberg.org/cache/epub/"+b.gid+"/pg"+b.gid+".txt",
+    "https://www.gutenberg.org/files/"+b.gid+"/"+b.gid+"-0.txt"
+  ];
+  (function tryNext(k){
+    if(k>=urls.length){
+      page.innerHTML='The archive cannot be reached from inside this sandbox.\n\n'+
+        'Open this site from the repository (or any hosting) and the complete novel streams in right here.\n\n'+
+        'Or read it now on Project Gutenberg: ';
+      var a=document.createElement("a");
+      a.href="https://www.gutenberg.org/ebooks/"+b.gid;a.target="_blank";a.rel="noopener";
+      a.textContent="gutenberg.org/ebooks/"+b.gid+" ↗";a.style.color="#8f1d22";
+      page.appendChild(a);
+      pos.textContent="offline";
+      return;
+    }
+    fetch(urls[k]).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(txt){
+      var s=txt.search(/\*\*\* ?START OF/i);
+      if(s>=0)txt=txt.slice(txt.indexOf("\n",s)+1);
+      var e=txt.search(/\*\*\* ?END OF/i);
+      if(e>=0)txt=txt.slice(0,e);
+      txt=txt.replace(/\r/g,"").trim();
+      var parasArr=txt.split(/\n\n+/),pages=[],cur="";
+      parasArr.forEach(function(p){
+        if(cur.length+p.length>3600&&cur){pages.push(cur.trim());cur=""}
+        cur+=p+"\n\n";
+      });
+      if(cur.trim())pages.push(cur.trim());
+      CACHE[slug]={pages:pages};
+      show();
+    }).catch(function(){tryNext(k+1)});
+  })(0);
+}
+
+/* ---------- router ---------- */
+var overlay=$("#overlay"),content=$("#panel-content");
+function openPanel(html){
+  content.innerHTML=html;
+  overlay.classList.add("open");
+  document.body.style.overflow="hidden";
+  $("#panel").scrollTop=0;
+}
+function closePanel(){
+  overlay.classList.remove("open");
+  document.body.style.overflow="";
+  if(location.hash.indexOf("#/")===0)history.pushState("",document.title,location.pathname+location.search);
+}
+function route(){
+  var h=location.hash;
+  if(h.indexOf("#/codex/")===0){var slug=h.slice(8);openPanel(renderCodex(slug))}
+  else if(h.indexOf("#/atlas/")===0){openPanel(renderChar(h.slice(8)))}
+  else if(h==="#/atlas"){openPanel(renderAtlas())}
+  else if(h==="#/philosophy"){openPanel(renderPhil())}
+  else closePanel();
+}
+window.addEventListener("hashchange",route);
+$("#panel-close").addEventListener("click",closePanel);
+overlay.addEventListener("click",function(e){if(e.target===overlay)closePanel()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&overlay.classList.contains("open"))closePanel()});
+/* delegated clicks inside panel + hash links anywhere */
+document.addEventListener("click",function(e){
+  var t=e.target.closest(".hashbtn");
+  if(t){location.hash=t.getAttribute("data-hash");return}
+  var tab=e.target.closest(".tab");
+  if(tab){
+    var n=tab.getAttribute("data-tab");
+    $("#panel").querySelectorAll(".tab").forEach(function(x){x.classList.toggle("on",x===tab)});
+    $("#panel").querySelectorAll(".tabpane").forEach(function(x){
+      x.classList.toggle("on",x.getAttribute("data-pane")===n)});
+    if(n==="4"){
+      var slug=location.hash.slice(8);
+      loadBook(slug);
+    }
+    return;
+  }
+  var ph=e.target.closest(".phi-head");
+  if(ph){ph.parentElement.classList.toggle("open")}
+});
+route();
+})();
+
+</script>
 <script>console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
 /**
  * @license
