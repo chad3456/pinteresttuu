@@ -105,8 +105,18 @@
   <div class="ptitle">Depth</div>
   <div class="sliderrow"><input type="range" id="in-depth" min="0" max="100" step="1" value="42"><output id="out-depth">42</output></div>
 
+  <div class="ptitle">Element size</div>
+  <div class="sliderrow"><input type="range" id="in-size" min="40" max="115" step="5" value="88"><output id="out-size">88</output></div>
+
+  <div class="ptitle">Shine</div>
+  <div class="sliderrow"><input type="range" id="in-shine" min="0" max="100" step="5" value="30"><output id="out-shine">30</output></div>
+
   <div class="ptitle">Palette</div>
   <div class="optrow" id="opt-style"></div>
+
+  <div class="ptitle">Effects</div>
+  <div class="sliderrow"><span style="min-width:58px">posterize</span><input type="range" id="in-poster" min="1" max="8" step="1" value="1"><output id="out-poster">off</output></div>
+  <div class="optrow" style="margin-top:10px"><button class="opt" id="btn-invert">Invert colors</button></div>
 
   <div class="ptitle">Export</div>
   <div class="exp">
@@ -115,11 +125,11 @@
   </div>
   <div id="stats">—</div>
 
-  <p class="hint"><b>Drag</b> to orbit · sliders re-forge live · voxel depth comes from brightness — bright pixels stand tall.</p>
+  <p class="hint"><b>Drag</b> to orbit · <b>scroll / pinch</b> to zoom · sliders re-forge live · bright pixels stand tall.</p>
 </aside>
 
 <div id="toast">saved</div>
-<div id="dragnote">drag to orbit · everything happens on your machine</div>
+<div id="dragnote">drag to orbit · scroll to zoom · everything happens on your machine</div>
 
 <script>console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
 /**
@@ -145,7 +155,7 @@
 (function(){
 "use strict";
 function $(s){return document.querySelector(s)}
-var state={mode:"voxel",res:56,depth:42,style:0,spin:true};
+var state={mode:"voxel",res:56,depth:42,style:0,spin:true,vox:88,shine:30,poster:1,invert:false};
 
 /* ================= three setup ================= */
 var renderer;
@@ -229,8 +239,11 @@ function sample(res){
   var n=w*h,cols=new Float32Array(n*3),lum=new Float32Array(n),alpha=new Float32Array(n);
   for(var i=0;i<n;i++){
     var r=d[i*4]/255,g=d[i*4+1]/255,b=d[i*4+2]/255,a=d[i*4+3]/255;
+    if(state.invert){r=1-r;g=1-g;b=1-b}
     var l=0.2126*r+0.7152*g+0.0722*b;
     var s=styleColor(r,g,b,l);
+    if(state.poster>1){var q=state.poster-1;
+      s[0]=Math.round(s[0]*q)/q;s[1]=Math.round(s[1]*q)/q;s[2]=Math.round(s[2]*q)/q}
     cols[i*3]=s[0];cols[i*3+1]=s[1];cols[i*3+2]=s[2];
     lum[i]=l;alpha[i]=a;
   }
@@ -246,11 +259,23 @@ function styleColor(r,g,b,l){
     var seg=Math.floor(h*6),rr=[1,x,0,0,x,1][seg],gg=[x,1,1,x,0,0][seg],bb=[0,0,x,1,1,x][seg];
     return[rr*0.9+0.1,gg*0.9+0.1,bb*0.9+0.1];
   }
+  if(state.style===3)return ramp(l,[[0.09,0.05,0.22],[0.92,0.32,0.36],[1.0,0.86,0.55]]);   /* sunset */
+  if(state.style===4)return ramp(l,[[0.04,0.09,0.2],[0.32,0.58,0.9],[0.95,0.98,1.0]]);      /* ice */
+  if(state.style===5)return[l,l,l];                                                          /* mono */
   return[r,g,b];
+}
+function ramp(l,st){
+  var t=l*2;
+  var a=t<1?st[0]:st[1],b=t<1?st[1]:st[2],f=t<1?t:t-1;
+  return[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f];
 }
 
 /* ================= builders ================= */
 var WORLD_W=12;
+function shineVals(){var s=state.shine/100;return[0.85-0.72*s,0.05+0.8*s]}
+function applyShine(){var rv=shineVals();obj.traverse(function(m){
+  if(m.isMesh&&m.material&&m.material.isMeshStandardMaterial){
+    m.material.roughness=rv[0];m.material.metalness=rv[1]}})}
 var assembleProg={v:1};
 var delays=null;   /* per-element assemble delays */
 var currentKind=null;
@@ -293,7 +318,7 @@ function buildRelief(s,depth,scl){
   }
   geo.setAttribute("color",new THREE.BufferAttribute(colors,3));
   geo.computeVertexNormals();
-  var mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:.1}));
+  var mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({vertexColors:true,roughness:shineVals()[0],metalness:shineVals()[1]}));
   mesh.rotation.x=-0.5;
   obj.add(mesh);
   /* thin base slab for that trophy feel */
@@ -314,9 +339,10 @@ function buildVoxels(s,depth,scl){
   var idx=[];
   for(var i=0;i<s.w*s.h;i++)if(s.alpha[i]>0.35&&s.lum[i]>0.075)idx.push(i);
   var count=idx.length;
-  var geo=new THREE.BoxGeometry(scl*0.92,scl*0.92,1);
+  var vs=scl*(state.vox/100);
+  var geo=new THREE.BoxGeometry(vs,vs,1);
   voxMesh=new THREE.InstancedMesh(geo,
-    new THREE.MeshStandardMaterial({roughness:.45,metalness:.15}),count);
+    new THREE.MeshStandardMaterial({roughness:shineVals()[0],metalness:shineVals()[1]}),count);
   voxHome=new Float32Array(count*4); /* x,y,z-scale,delay */
   var color=new THREE.Color();
   for(var k=0;k<count;k++){
@@ -369,7 +395,7 @@ function buildParticles(s,depth,scl){
   geo.setAttribute("aSpd",new THREE.BufferAttribute(spd,1));
   var mat=new THREE.ShaderMaterial({
     transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-    uniforms:{uProg:{value:0},uTime:sharedTime,uSize:{value:scl*1.5}},
+    uniforms:{uProg:{value:0},uTime:sharedTime,uSize:{value:scl*1.5*(state.vox/88)}},
     vertexShader:[
       "attribute vec3 aColor;attribute float aDelay;attribute float aSpd;",
       "uniform float uProg;uniform float uTime;uniform float uSize;",
@@ -464,11 +490,15 @@ mkOpts($("#opt-mode"),[{n:"Voxels",v:"voxel"},{n:"Relief",v:"relief"},{n:"Partic
   var v=state.mode==="relief"?{p:[0,9,15],t:[0,0,0]}:state.mode==="particle"?{p:[0,3,16],t:[0,0,0]}:{p:[0,7,17],t:[0,0,0]};
   gsap.to(camera.position,{x:v.p[0],y:v.p[1],z:v.p[2],duration:1,ease:"power3.inOut"});
 });
-mkOpts($("#opt-style"),[{n:"Original",v:0},{n:"Duotone",v:1},{n:"Neon",v:2}],"style",forge);
+mkOpts($("#opt-style"),[{n:"Original",v:0},{n:"Duotone",v:1},{n:"Neon",v:2},{n:"Sunset",v:3},{n:"Ice",v:4},{n:"Mono",v:5}],"style",forge);
 var forgeDeb=null;
 function debForge(){clearTimeout(forgeDeb);forgeDeb=setTimeout(forge,180)}
 $("#in-res").addEventListener("input",function(){state.res=+this.value;$("#out-res").textContent=this.value;debForge()});
 $("#in-depth").addEventListener("input",function(){state.depth=+this.value;$("#out-depth").textContent=this.value;debForge()});
+$("#in-size").addEventListener("input",function(){state.vox=+this.value;$("#out-size").textContent=this.value;debForge()});
+$("#in-shine").addEventListener("input",function(){state.shine=+this.value;$("#out-shine").textContent=this.value;applyShine()});
+$("#in-poster").addEventListener("input",function(){state.poster=+this.value;$("#out-poster").textContent=this.value==="1"?"off":this.value;debForge()});
+$("#btn-invert").addEventListener("click",function(){state.invert=!state.invert;this.classList.toggle("on",state.invert);forge()});
 $("#btn-spin").addEventListener("click",function(){
   state.spin=!state.spin;
   this.textContent=state.spin?"auto-spin on":"auto-spin off";
@@ -506,7 +536,7 @@ $("#exp-obj").addEventListener("click",function(){
     var vi=0,sclv=WORLD_W/sample(8).w; /* unit from current forge */
     for(var k=0;k<voxMesh.count;k++){
       var x=voxHome[k*4],y=voxHome[k*4+1],z=voxHome[k*4+2];
-      var hw=0.46*(WORLD_W/state.res);
+      var hw=0.5*(state.vox/100)*(WORLD_W/state.res);
       var corners=[[-hw,-hw,0],[hw,-hw,0],[hw,hw,0],[-hw,hw,0],[-hw,-hw,z],[hw,-hw,z],[hw,hw,z],[-hw,hw,z]];
       corners.forEach(function(cn){lines.push("v "+(x+cn[0]).toFixed(3)+" "+(y+cn[1]).toFixed(3)+" "+cn[2].toFixed(3))});
       var o=vi*8;
@@ -525,15 +555,36 @@ $("#exp-obj").addEventListener("click",function(){
 });
 
 /* ================= orbit + loop ================= */
-var drag=false,px=0,py=0;
-renderer.domElement.addEventListener("pointerdown",function(e){drag=true;px=e.clientX;py=e.clientY});
-window.addEventListener("pointerup",function(){drag=false});
+var pts={},drag=false,px=0,py=0,pinchD=0;
+function pinchDist(){var k=Object.keys(pts);if(k.length<2)return 0;
+  var a=pts[k[0]],b=pts[k[1]];return Math.hypot(a[0]-b[0],a[1]-b[1])}
+function zoomBy(f){
+  var v=camera.position.clone().sub(camTgt);
+  var d=THREE.MathUtils.clamp(v.length()*f,5.5,44);
+  camera.position.copy(camTgt).add(v.normalize().multiplyScalar(d));
+}
+renderer.domElement.addEventListener("pointerdown",function(e){
+  pts[e.pointerId]=[e.clientX,e.clientY];
+  if(Object.keys(pts).length===1){drag=true;px=e.clientX;py=e.clientY}
+  else{drag=false;pinchD=pinchDist()}
+});
+window.addEventListener("pointerup",function(e){delete pts[e.pointerId];drag=false;pinchD=0});
+window.addEventListener("pointercancel",function(e){delete pts[e.pointerId];drag=false;pinchD=0});
 window.addEventListener("pointermove",function(e){
+  if(pts[e.pointerId])pts[e.pointerId]=[e.clientX,e.clientY];
+  if(Object.keys(pts).length===2){
+    var nd=pinchDist();
+    if(pinchD>0&&nd>0)zoomBy(pinchD/nd);
+    pinchD=nd;return;
+  }
   if(!drag)return;
   rig.rotation.y+=(e.clientX-px)*.005;
   rig.rotation.x=THREE.MathUtils.clamp(rig.rotation.x+(e.clientY-py)*.004,-0.5,0.9);
   px=e.clientX;py=e.clientY;
 });
+renderer.domElement.addEventListener("wheel",function(e){
+  e.preventDefault();zoomBy(1+e.deltaY*0.0012);
+},{passive:false});
 var clock=new THREE.Clock();
 function frame(){
   requestAnimationFrame(frame);
@@ -554,6 +605,8 @@ forge();
 frame();
 
 window.__forge={state:state,count:function(){return lastCount},
+  camDist:function(){return camera.position.distanceTo(camTgt)},
+  shineProbe:function(){var v=null;obj.traverse(function(m){if(v===null&&m.isMesh&&m.material&&m.material.isMeshStandardMaterial)v=m.material.roughness});return v},
   mode:function(){return state.mode},forge:forge,
   children:function(){return obj.children.length}};
 })();
