@@ -41,3 +41,8 @@ gallery in its era: palette, frame style (rock face, stone, gilt, float
 frame), and wall text.
 
 Respects `prefers-reduced-motion`. Works on desktop and mobile.
+
+## Also in this repo
+
+- [`shashn/`](shashn/) — **Shashn**, a satirical political strategy board
+  game for 3–5 players (pass-and-play, single self-contained HTML file).

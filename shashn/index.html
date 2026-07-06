@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Shashn — a satirical political strategy board game. Win majorities in 9 zones with voters, ideology, gerrymandering and conspiracies.">
+<title>Shashn — The Strategy Game of Politics</title>
+<style>
+  :root{
+    --bg:#12151d;
+    --bg2:#181c27;
+    --panel:#1e2432;
+    --panel2:#242b3c;
+    --line:#323b52;
+    --ink:#e8e6df;
+    --muted:#9aa3b5;
+    --gold:#e0b64f;
+    --gold-dim:#9a7d34;
+    --bad:#e05252;
+    --good:#46b06e;
+    --display:Georgia,"Times New Roman",serif;
+    --body:system-ui,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{background:radial-gradient(1200px 700px at 50% -10%,#1c2231,var(--bg));color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+  button{font:inherit;color:inherit;cursor:pointer}
+  h1,h2,h3{font-family:var(--display)}
+  .btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 14px;color:var(--ink)}
+  .btn:hover:not(:disabled){border-color:var(--gold-dim)}
+  .btn:disabled{opacity:.38;cursor:not-allowed}
+  .btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1608;font-weight:600}
+  .btn.danger{border-color:#7a3a3a;color:#f0b1b1}
+  .btn.small{padding:3px 10px;font-size:13px}
+
+  /* ---------- setup ---------- */
+  .setup{max-width:560px;margin:6vh auto;padding:32px;background:var(--panel);border:1px solid var(--line);border-radius:14px;text-align:center}
+  .setup h1{font-size:44px;color:var(--gold);letter-spacing:.06em}
+  .setup .tag{color:var(--muted);margin:6px 0 24px;font-style:italic}
+  .setup label{display:block;text-align:left;margin:14px 0 6px;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em}
+  .setup select,.setup input{width:100%;padding:9px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;color:var(--ink);font:inherit}
+  .setup .start{margin-top:26px;width:100%;padding:12px;font-size:17px}
+  .lobby{max-width:560px;margin:14vh auto;text-align:center;color:var(--muted)}
+  .lobby h1{color:var(--gold);font-size:34px;margin-bottom:10px}
+
+  /* ---------- layout ---------- */
+  header.top{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:rgba(18,21,29,.9);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+  header.top h1{font-size:22px;color:var(--gold);letter-spacing:.08em}
+  header.top .sub{color:var(--muted);font-size:13px}
+  header.top .spacer{flex:1}
+  .game{display:flex;gap:16px;padding:16px;align-items:flex-start;max-width:1500px;margin:0 auto}
+  @media(max-width:1020px){.game{flex-direction:column}.side{width:100%!important}}
+
+  /* ---------- hint bar (pick mode) ---------- */
+  .hintbar{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:60;background:var(--gold);color:#1a1608;padding:10px 16px;border-radius:10px;display:flex;gap:14px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.5);font-weight:600;max-width:92vw}
+  .hintbar .btn{background:#1a1608;color:var(--gold);border:none}
+
+  /* ---------- board ---------- */
+  .board{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;min-width:0}
+  .zone{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:130px;position:relative;transition:border-color .15s, box-shadow .15s}
+  .zone.decided{border-color:var(--gold-dim);background:linear-gradient(180deg,#25293a,var(--panel))}
+  .zone.pickable{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 0 18px rgba(224,182,79,.35);cursor:pointer}
+  .z-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:6px}
+  .z-name{font-family:var(--display);font-size:15px}
+  .z-nums{font-weight:700;color:var(--gold);font-size:15px;white-space:nowrap}
+  .z-nums small{color:var(--muted);font-weight:400}
+  .z-slots{display:flex;flex-wrap:wrap;gap:5px}
+  .slot{width:20px;height:20px;border-radius:50%;border:2px dashed #46506b;display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1;position:relative}
+  .slot.vol{border:2px solid #000;background:#0a0b0f;box-shadow:inset 0 0 0 2px #000, 0 0 0 1px #444}
+  .slot.filled{border-style:solid;border-color:rgba(255,255,255,.55)}
+  .slot.filled.vol{border-color:#000}
+  .slot.flip{box-shadow:0 0 6px 1px rgba(224,182,79,.8);border-color:var(--gold)}
+  .slot.lock::after{content:"";position:absolute;inset:-4px;border:1px solid #000;border-radius:50%}
+  .slot.pickable{cursor:pointer;box-shadow:0 0 0 2px var(--gold),0 0 10px rgba(224,182,79,.7)}
+  .z-owner{margin-top:8px;font-size:12.5px;color:var(--gold)}
+  .z-vol-note{position:absolute;top:8px;right:10px}
+
+  /* ---------- sidebar ---------- */
+  .side{width:390px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+  .side.noclick .panel:not(.logpanel){opacity:.55;pointer-events:none}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .panel h3{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:9px;font-family:var(--body)}
+  .cur-name{font-family:var(--display);font-size:21px;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+  .cur-name .dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+  .cur-score{color:var(--gold);font-size:13px;margin-bottom:8px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{display:flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:3px 10px 3px 6px;font-size:14px}
+  .chip b{font-size:15px}
+  .ideos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+  .ideo{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12.5px;display:flex;align-items:center;gap:6px}
+  .ideo .lv{margin-left:auto;font-weight:700;color:var(--gold)}
+  .ideo .pw{font-size:10px;color:var(--good)}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .actions .wide{grid-column:1/-1}
+  .hand{margin-top:10px}
+  .hcard{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 9px;margin-top:6px;font-size:13px}
+  .hcard .nm{font-weight:600;color:var(--gold)}
+  .hcard .btn{margin-left:auto}
+
+  /* ---------- market ---------- */
+  .mrow{display:flex;gap:8px;flex-wrap:wrap}
+  .vcard{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:78px;text-align:center;cursor:pointer;transition:border-color .12s}
+  .vcard:hover{border-color:var(--gold)}
+  .vcard.cant{opacity:.45;cursor:not-allowed}
+  .vcard .sz{font-size:17px;font-weight:700}
+  .vcard .cost{font-size:13px;margin-top:3px;letter-spacing:.05em}
+  .ccard{background:var(--bg2);border:1px solid #59406b;border-radius:10px;padding:8px 10px;flex:1;min-width:150px;cursor:pointer;font-size:12.5px}
+  .ccard:hover{border-color:#a06ee0}
+  .ccard.cant{opacity:.45;cursor:not-allowed}
+  .ccard .nm{font-weight:700;color:#c9a6ee}
+  .ccard .cost{color:var(--muted)}
+
+  /* ---------- players strip ---------- */
+  .prow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed #2a3247;font-size:13px}
+  .prow:last-child{border-bottom:none}
+  .prow .dot{width:11px;height:11px;border-radius:50%}
+  .prow .nm{font-weight:600;min-width:80px}
+  .prow .mini{color:var(--muted);font-size:12px;margin-left:auto;text-align:right}
+  .prow.active .nm{color:var(--gold)}
+
+  /* ---------- log ---------- */
+  .logpanel .entries{max-height:190px;overflow-y:auto;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+  .logpanel .entries div:first-child{color:var(--ink)}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(6,8,12,.72);z-index:80;display:flex;align-items:center;justify-content:center;padding:18px}
+  .modal{background:var(--panel);border:1px solid var(--gold-dim);border-radius:14px;padding:22px 24px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .modal h3{color:var(--gold);font-size:20px;margin-bottom:10px}
+  .m-body,.m-desc{color:var(--ink);margin-bottom:10px}
+  .m-desc{color:var(--muted);font-size:13.5px}
+  .m-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+  .m-body .q{font-family:var(--display);font-size:19px;margin-bottom:8px}
+  .m-body .hint{color:var(--muted);font-size:13px;font-style:italic}
+  .res-rows{display:flex;flex-direction:column;gap:7px;margin:8px 0}
+  .res-row{display:flex;align-items:center;gap:9px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+  .res-row .res-nm{flex:1;font-size:14px}
+  .res-row .have{color:var(--muted);font-size:12px}
+  .stp{width:30px;height:30px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);font-size:17px}
+  .qty{min-width:22px;text-align:center;font-weight:700}
+
+  /* ---------- toast ---------- */
+  .toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--gold-dim);color:var(--ink);padding:9px 18px;border-radius:10px;z-index:90;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:tfade 2.6s forwards}
+  @keyframes tfade{0%{opacity:0;translate:0 -6px}10%{opacity:1;translate:0 0}80%{opacity:1}100%{opacity:0}}
+
+  /* ---------- end screen ---------- */
+  .endwrap{max-width:620px;margin:8vh auto;text-align:center;padding:0 16px}
+  .endwrap h1{color:var(--gold);font-size:40px;margin-bottom:6px}
+  .stand{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:18px;padding:8px 0}
+  .stand .prow{padding:10px 18px;font-size:16px}
+  .stand .pts{margin-left:auto;color:var(--gold);font-weight:700}
+
+  .rules h4{color:var(--gold);margin:12px 0 4px;font-family:var(--body);font-size:14px}
+  .rules p,.rules li{font-size:13.5px;color:var(--ink)}
+  .rules ul{padding-left:18px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/* ================= utilities ================= */
+const $=s=>document.querySelector(s);
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ================= static data ================= */
+const RES=[
+  {id:'funds',name:'Campaign Funds',icon:'💰'},
+  {id:'media',name:'Media Attention',icon:'📺'},
+  {id:'trust',name:"People's Trust",icon:'🤝'},
+  {id:'clout',name:'Clout on the Street',icon:'✊'},
+];
+const RESBY=Object.fromEntries(RES.map(r=>[r.id,r]));
+const rsum=o=>RES.reduce((n,r)=>n+(o[r.id]||0),0);
+const fmtRes=o=>RES.filter(r=>o[r.id]).map(r=>`${o[r.id]}${r.icon}`).join(' ')||'nothing';
+
+const IDEO=[
+  {id:'cap', name:'Capitalist', res:'funds', icon:'🏦'},
+  {id:'sup', name:'Supremo',    res:'clout', icon:'👑'},
+  {id:'show',name:'Showstopper',res:'media', icon:'🎤'},
+  {id:'idea',name:'Idealist',   res:'trust', icon:'🕊️'},
+];
+const IDEOBY=Object.fromEntries(IDEO.map(d=>[d.id,d]));
+
+const COLORS=[
+  {c:'#e05252',sym:'🦁'},{c:'#4f8de0',sym:'🐘'},
+  {c:'#46b06e',sym:'🌹'},{c:'#e0a23f',sym:'☀️'},{c:'#a06ee0',sym:'⭐'},
+];
+
+/* 9 zones; maj = votes needed for majority, total = seats; vol = volatile (black-circle) spots.
+   Volatile spots across the map: 1+1+1+2+2+1+1+1+1 = 11. */
+const ZONE_DEFS=[
+  {name:'North-West', total:11, maj:6, vol:1},
+  {name:'North',      total:13, maj:7, vol:1},
+  {name:'North-East', total:9,  maj:5, vol:1},
+  {name:'West',       total:15, maj:8, vol:2},
+  {name:'The Capital',total:17, maj:9, vol:2},
+  {name:'East',       total:13, maj:7, vol:1},
+  {name:'South-West', total:9,  maj:5, vol:1},
+  {name:'South',      total:15, maj:8, vol:1},
+  {name:'South-East', total:11, maj:6, vol:1},
+];
+/* Orthogonal neighbours are always adjacent. Bigger zones (15+ seats) also
+   reach diagonally — the bigger the zone, the more zones it can gerrymander. */
+function adjacent(a,b){
+  const ax=a%3,ay=a/3|0,bx=b%3,by=b/3|0;
+  const dx=Math.abs(ax-bx),dy=Math.abs(ay-by);
+  if(dx+dy===1)return true;
+  if(dx===1&&dy===1)return ZONE_DEFS[a].total>=15||ZONE_DEFS[b].total>=15;
+  return false;
+}
+
+/* Ideology cards: question on top, Yes/No answers. The ideologue and the
+   resource payout stay hidden until the player has answered. */
+const IDEO_QS=[
+  {q:'Should the city sell naming rights to public parks?',a:[{t:'Yes',i:'cap',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Should every rally end with a laser-and-fireworks show?',a:[{t:'Yes',i:'show',n:2},{t:'No',i:'cap',n:1}]},
+  {q:"Should the Leader's portrait hang in every classroom?",a:[{t:'Yes',i:'sup',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Should big donors get a fast lane at City Hall?',a:[{t:'Yes',i:'cap',n:3},{t:'No',i:'idea',n:2}]},
+  {q:'Should the TV debate be replaced with a talent show?',a:[{t:'Yes',i:'show',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Is loyalty to the Leader worth more than the manifesto?',a:[{t:'Yes',i:'sup',n:3},{t:'No',i:'idea',n:1}]},
+  {q:'Should potholes be fixed only where cameras are rolling?',a:[{t:'Yes',i:'show',n:1},{t:'No',i:'idea',n:2}]},
+  {q:'Should the youth wing get free megaphones?',a:[{t:'Yes',i:'show',n:1},{t:'No',i:'sup',n:1}]},
+  {q:'Promise everything now, figure it out after the election?',a:[{t:'Yes',i:'show',n:2},{t:'No',i:'idea',n:2}]},
+  {q:'Should party tickets go to the highest bidder?',a:[{t:'Yes',i:'cap',n:2},{t:'No',i:'idea',n:2}]},
+  {q:'Should dissenting officers be transferred to remote districts?',a:[{t:'Yes',i:'sup',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Should the manifesto be one page, mostly pictures?',a:[{t:'Yes',i:'show',n:1},{t:'No',i:'idea',n:1}]},
+  {q:'Should drinking water be priced by the market?',a:[{t:'Yes',i:'cap',n:3},{t:'No',i:'idea',n:2}]},
+  {q:'Must every speech quote the Leader at least five times?',a:[{t:'Yes',i:'sup',n:2},{t:'No',i:'show',n:1}]},
+  {q:'Campaign in poetry, govern in spreadsheets?',a:[{t:'Yes',i:'idea',n:2},{t:'No',i:'cap',n:2}]},
+  {q:'Should street protests need a paid permit?',a:[{t:'Yes',i:'cap',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Should the party anthem play before every movie?',a:[{t:'Yes',i:'sup',n:1},{t:'No',i:'show',n:1}]},
+  {q:'Should billboards outnumber trees on Main Street?',a:[{t:'Yes',i:'cap',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Should we govern by viral poll?',a:[{t:'Yes',i:'show',n:2},{t:'No',i:'sup',n:1}]},
+  {q:"Should rivals' scandals be leaked at 9 PM sharp?",a:[{t:'Yes',i:'show',n:2},{t:'No',i:'idea',n:1}]},
+  {q:'Should the census count followers instead of citizens?',a:[{t:'Yes',i:'show',n:1},{t:'No',i:'idea',n:1}]},
+  {q:'Should ministries be run like franchises?',a:[{t:'Yes',i:'cap',n:2},{t:'No',i:'sup',n:1}]},
+  {q:"Should the Leader's birthday be a public holiday?",a:[{t:'Yes',i:'sup',n:2},{t:'No',i:'cap',n:1}]},
+  {q:'Free buses for everyone, paid for somehow?',a:[{t:'Yes',i:'idea',n:2},{t:'No',i:'cap',n:2}]},
+  {q:'Should whistle-blowers get medals?',a:[{t:'Yes',i:'idea',n:2},{t:'No',i:'sup',n:2}]},
+  {q:'Should every promise come with a money-back guarantee?',a:[{t:'Yes',i:'cap',n:1},{t:'No',i:'show',n:1}]},
+  {q:'Should slum rooftops become advertising space?',a:[{t:'Yes',i:'cap',n:2},{t:'No',i:'idea',n:1}]},
+  {q:"Should exit polls be banned until you're winning?",a:[{t:'Yes',i:'sup',n:2},{t:'No',i:'idea',n:1}]},
+];
+
+/* Conspiracy cards cost 4–5 resources (any mix) and can be held for later. */
+const CONSP_DEFS=[
+  {id:'recount', name:'Recount',        cost:4,desc:'Move any one blank, unlocked voter to an adjacent zone — no gerrymandering rights needed.'},
+  {id:'warchest',name:'War Chest',      cost:4,desc:'Take 3 resources of your choice from the public reserve.'},
+  {id:'blackout',name:'Media Blackout', cost:4,desc:'Choose a rival: they cannot gerrymander on their next turn.'},
+  {id:'fakenews',name:'Fake News',      cost:5,desc:'Remove one rival blank, unlocked voter from the board.'},
+  {id:'defect',  name:'Defection',      cost:5,desc:'One rival blank, unlocked voter switches to your party.'},
+  {id:'horse',   name:'Horse Trading',  cost:5,desc:'Steal 2 random resources from a rival.'},
+  {id:'sting',   name:'Sting Operation',cost:5,desc:'A rival of your choice must discard 3 resources.'},
+  {id:'rally',   name:'Snap Rally',     cost:5,desc:'Place 2 free voters on normal spots in one zone.'},
+];
+
+/* Headline cards drop when a voter enters a volatile (black-circle) area.
+   Resolved at the end of that round. Mostly bad news. */
+const HEADLINE_DEFS=[
+  {id:'scandal',  name:'Scandal Breaks!',          bad:1,desc:'Discard 2 resources.'},
+  {id:'probe',    name:'Funding Probe',            bad:1,desc:'Lose 3 Campaign Funds.'},
+  {id:'smear',    name:'Smear Campaign',           bad:1,desc:"Lose 2 People's Trust."},
+  {id:'oped',     name:'Hostile Op-Ed',            bad:1,desc:'Lose 2 Media Attention.'},
+  {id:'riot',     name:'Riots Erupt',              bad:1,desc:'Every party loses one blank voter in this zone.'},
+  {id:'crackdown',name:'Police Crackdown',         bad:1,desc:'Remove one of your blank voters from this zone (the volatile voter itself is untouchable).'},
+  {id:'curfew',   name:'Curfew Imposed',           bad:1,desc:'You cannot gerrymander on your next turn.'},
+  {id:'booth',    name:'Booth-Capture Allegations',bad:1,desc:'The rival with the most votes in this zone places one free voter here.'},
+  {id:'sympathy', name:'Sympathy Wave',            bad:0,desc:'Gain 2 resources of your choice.'},
+  {id:'viral',    name:'Viral Moment',             bad:0,desc:'Gain 3 Media Attention.'},
+  {id:'hero',     name:'Local Hero',               bad:0,desc:'Gain 2 Clout on the Street.'},
+  {id:'ground',   name:'Ground Report',            bad:0,desc:'Place one free voter on a normal spot in this zone.'},
+];
+
+/* Voter cards come in 3 sizes: 1, 2 or 3 voters. Cost = 2 resources per voter,
+   printed in up to two resource types. */
+function mkVoterCard(size){
+  const total=size*2,cost={};
+  const t1=RES[Math.random()*4|0].id;
+  let t2=RES[Math.random()*4|0].id;
+  if(t2===t1)t2=RES[(RES.findIndex(r=>r.id===t1)+1)%4].id;
+  const k=Math.random()<.4?total:1+(Math.random()*(total-1)|0);
+  cost[t1]=k;
+  if(k<total)cost[t2]=(cost[t2]||0)+(total-k);
+  return {size,cost};
+}
+function buildVoterDeck(){
+  const d=[];
+  for(let i=0;i<12;i++)d.push(mkVoterCard(1));
+  for(let i=0;i<10;i++)d.push(mkVoterCard(2));
+  for(let i=0;i<8;i++)d.push(mkVoterCard(3));
+  return shuffle(d);
+}
+function buildDeck(defs,copies){
+  const d=[];
+  defs.forEach(x=>{for(let i=0;i<copies;i++)d.push({...x});});
+  return shuffle(d);
+}
+function draw(deck,discard){
+  if(!deck.length&&discard.length)deck.push(...shuffle(discard.splice(0)));
+  return deck.pop();
+}
+
+/* ================= state ================= */
+let S={screen:'setup'};
+const cp=()=>S.players[S.cur];
+
+function newGame(names){
+  S={
+    screen:'game',round:1,log:[],pick:null,pending:[],
+    players:names.map((n,i)=>({
+      name:n,color:COLORS[i].c,sym:COLORS[i].sym,
+      res:{funds:0,media:0,trust:0,clout:0},
+      ideo:{cap:[],sup:[],show:[],idea:[]},
+      hand:[],score:0,noGerry:0,
+    })),
+    zones:ZONE_DEFS.map((z,i)=>({
+      ...z,idx:i,decided:null,
+      slots:Array.from({length:z.total},(_,k)=>({p:null,flip:false,lock:false,vol:k>=z.total-z.vol})),
+    })),
+    decks:{
+      voter:buildVoterDeck(),voterDis:[],
+      ideo:buildDeck(IDEO_QS,2),ideoDis:[],
+      consp:buildDeck(CONSP_DEFS,2),conspDis:[],
+      head:buildDeck(HEADLINE_DEFS,2),headDis:[],
+    },
+    market:[],offer:[],cur:0,first:0,flags:{},
+  };
+  for(let i=0;i<4;i++)S.market.push(draw(S.decks.voter,S.decks.voterDis));
+  for(let i=0;i<2;i++)S.offer.push(draw(S.decks.consp,S.decks.conspDis));
+}
+
+/* ================= small helpers ================= */
+function log(msg){S.log.push(`R${S.round||'-'} · ${msg}`);}
+function toast(msg){const t=el('div','toast',msg);document.body.append(t);setTimeout(()=>t.remove(),2700);}
+function gain(p,o){RES.forEach(r=>p.res[r.id]+=o[r.id]||0);}
+function lose(p,o){RES.forEach(r=>p.res[r.id]=Math.max(0,p.res[r.id]-(o[r.id]||0)));}
+function canPay(p,cost){return RES.every(r=>p.res[r.id]>=(cost[r.id]||0));}
+function zoneCounts(z){const c=S.players.map(()=>0);z.slots.forEach(s=>{if(s.p!=null)c[s.p]++;});return c;}
+function freeNormal(z){return z.slots.filter(s=>s.p==null&&!s.vol);}
+function freeVol(z){return z.slots.filter(s=>s.p==null&&s.vol);}
+function freeCount(z){return z.slots.filter(s=>s.p==null).length;}
+function maxLevel(p){return Math.max(...IDEO.map(d=>p.ideo[d.id].length));}
+function rightsZones(pi){
+  return S.zones.filter(z=>{
+    const c=zoneCounts(z),m=Math.max(...c);
+    return m>0&&c[pi]===m&&c.filter(x=>x===m).length===1;
+  }).map(z=>z.idx);
+}
+
+/* ================= modal & pickers ================= */
+function modal(o){
+  return new Promise(res=>{
+    const ov=el('div','overlay'),m=el('div','modal');
+    if(o.title)m.append(el('h3',null,o.title));
+    if(o.body)m.append(typeof o.body==='string'?el('div','m-body',o.body):o.body);
+    const bb=el('div','m-btns');
+    (o.buttons||[{label:'OK',value:true,cls:'btn primary'}]).forEach(b=>{
+      const btn=el('button',b.cls||'btn',b.label);
+      btn.onclick=()=>{ov.remove();res(b.value);};
+      bb.append(btn);
+    });
+    m.append(bb);ov.append(m);document.body.append(ov);
+  });
+}
+
+/* Pick n resources with steppers. o:{title,desc,min,max,limit(id)->max,cancellable} */
+function pickRes(o){
+  return new Promise(res=>{
+    const cnt={funds:0,media:0,trust:0,clout:0};
+    const ov=el('div','overlay'),m=el('div','modal');
+    m.append(el('h3',null,o.title));
+    if(o.desc)m.append(el('div','m-desc',o.desc));
+    const rows=el('div','res-rows'),info=el('div','m-desc');
+    const ok=el('button','btn primary','Confirm');
+    const qty={};
+    const lim=id=>o.limit?o.limit(id):99;
+    const upd=()=>{
+      const t=rsum(cnt);
+      info.textContent=`Selected: ${t}`+(o.max!=null?` / ${o.max}`:'')+(o.min&&o.min!==o.max?` (min ${o.min})`:'');
+      ok.disabled=t<(o.min||0)||(o.max!=null&&t>o.max);
+      RES.forEach(r=>qty[r.id].textContent=cnt[r.id]);
+    };
+    RES.forEach(r=>{
+      const row=el('div','res-row');
+      row.append(el('span',null,r.icon),el('span','res-nm',r.name),el('span','have',o.limit?`have ${lim(r.id)}`:''));
+      const minus=el('button','stp','−'),q=el('span','qty','0'),plus=el('button','stp','+');
+      qty[r.id]=q;
+      minus.onclick=()=>{if(cnt[r.id]>0){cnt[r.id]--;upd();}};
+      plus.onclick=()=>{if(cnt[r.id]<lim(r.id)&&(o.max==null||rsum(cnt)<o.max)){cnt[r.id]++;upd();}};
+      row.append(minus,q,plus);rows.append(row);
+    });
+    m.append(rows,info);
+    const bb=el('div','m-btns');
+    if(o.cancellable){const c=el('button','btn','Cancel');c.onclick=()=>{ov.remove();res(null);};bb.append(c);}
+    ok.onclick=()=>{ov.remove();res({...cnt});};
+    bb.append(ok);m.append(bb);ov.append(m);document.body.append(ov);upd();
+  });
+}
+
+async function pickPlayer(title,excludeIdx){
+  const btns=S.players.map((p,i)=>i===excludeIdx?null:{label:`${p.sym} ${p.name}`,value:i}).filter(Boolean);
+  btns.push({label:'Cancel',value:null});
+  return modal({title,buttons:btns});
+}
+
+function pickZone(hint,filter){return new Promise(r=>{S.pick={type:'zone',hint,filter,resolve:r};render();});}
+function pickSlot(hint,filter){return new Promise(r=>{S.pick={type:'slot',hint,filter,resolve:r};render();});}
+function endPick(v){const r=S.pick.resolve;S.pick=null;render();r(v);}
+
+async function capCheck(p){
+  const t=rsum(p.res);
+  if(t>12){
+    const d=await pickRes({title:`${p.name}: over the 12-resource limit!`,desc:`A player may hold at most 12 resources. Discard ${t-12} now.`,min:t-12,max:t-12,limit:id=>p.res[id]});
+    lose(p,d);
+    log(`${p.name} discards ${fmtRes(d)} (12-resource limit).`);
+  }
+}
+
+/* ================= majority & placement ================= */
+function checkMajority(zi){
+  const z=S.zones[zi];
+  if(z.decided!=null)return;
+  const c=zoneCounts(z);
+  for(let pi=0;pi<S.players.length;pi++){
+    if(c[pi]>=z.maj){
+      z.decided=pi;
+      const mine=z.slots.filter(s=>s.p===pi);
+      mine.sort((a,b)=>(b.lock?1:0)-(a.lock?1:0));
+      for(let k=0;k<z.maj;k++)mine[k].flip=true;
+      S.players[pi].score+=z.maj;
+      log(`🎉 ${S.players[pi].name} forms the MAJORITY in ${z.name} — ${z.maj} points! Tokens flip to the party symbol.`);
+      toast(`🎉 ${S.players[pi].name} takes ${z.name} (+${z.maj})`);
+      if(S.zones.every(x=>x.decided!=null))endGame();
+      return;
+    }
+  }
+}
+
+async function placeVoters(pi,zi,n,allowVol){
+  const z=S.zones[zi];
+  let volN=0;
+  if(allowVol&&freeVol(z).length>0){
+    const nf=freeNormal(z).length,vf=freeVol(z).length;
+    const minV=Math.max(0,n-nf),maxV=Math.min(n,vf);
+    if(maxV>0){
+      if(minV===maxV)volN=minV;
+      else volN=await modal({
+        title:'Volatile spots ⚫',
+        body:`How many of the ${n} voter(s) go on <b>volatile</b> (black-circle) spots in ${z.name}?<br><span class="hint">Each drops a Headline at the end of this round, and that voter is locked in place forever.</span>`,
+        buttons:Array.from({length:maxV-minV+1},(_,k)=>({label:String(minV+k),value:minV+k})),
+      });
+    }
+  }
+  for(let k=0;k<n;k++){
+    const vol=k<volN;
+    const slot=(vol?freeVol(z):freeNormal(z))[0];
+    slot.p=pi;
+    if(vol){
+      slot.lock=true;
+      S.pending.push({p:pi,z:zi});
+      log(`⚫ ${S.players[pi].name}'s voter enters a volatile area in ${z.name} — a Headline drops at round end.`);
+    }
+  }
+}
+
+/* ================= voter cards ================= */
+async function buyVoter(i){
+  const p=cp(),c=S.market[i];
+  if(!c)return;
+  if(!canPay(p,c.cost))return toast('Not enough resources for that voter card.');
+  const zi=await pickZone(`Place ${c.size} voter(s) — all voters from one card go to the SAME zone.`,
+    z=>z.decided==null&&freeCount(z)>=c.size);
+  if(zi==null)return;
+  lose(p,c.cost);
+  log(`${p.name} pays ${fmtRes(c.cost)} to the public reserve for a ${c.size}-voter card → ${S.zones[zi].name}.`);
+  await placeVoters(S.cur,zi,c.size,true);
+  S.decks.voterDis.push(c);
+  S.market[i]=draw(S.decks.voter,S.decks.voterDis);
+  checkMajority(zi);
+  render();
+}
+
+/* ================= ideology ================= */
+async function answerIdeology(){
+  if(S.flags.ideo)return toast('One ideology question per turn.');
+  const card=draw(S.decks.ideo,S.decks.ideoDis);
+  if(!card){S.flags.ideo=true;return toast('The ideology deck is exhausted.');}
+  const p=cp();
+  const pick=await modal({
+    title:'📜 Ideology Question',
+    body:`<div class="q">${card.q}</div><p class="hint">The reader tells you only the question and the two answers. The ideologue and reward stay hidden — answer carefully.</p>`,
+    buttons:[{label:card.a[0].t,value:0,cls:'btn primary'},{label:card.a[1].t,value:1,cls:'btn primary'}],
+  });
+  const ans=card.a[pick],d=IDEOBY[ans.i];
+  p.ideo[ans.i].push(card);
+  gain(p,{[d.res]:ans.n});
+  S.flags.ideo=true;
+  const lvl=p.ideo[ans.i].length;
+  log(`${p.name} answers "${ans.t}" — +${ans.n} ${RESBY[d.res].name}; ${d.name} rises to level ${lvl}.`);
+  await modal({
+    title:`${d.icon} ${d.name} — level ${lvl}`,
+    body:`That answer belonged to the <b>${d.name}</b>. The card goes under that ideologue on your mat.<br>You gain <b>${ans.n} ${RESBY[d.res].icon} ${RESBY[d.res].name}</b>.`+
+      (lvl===3?'<br><b style="color:var(--good)">Level 3 power unlocked: Backroom Exchange.</b>':'')+
+      (lvl===5?'<br><b style="color:var(--good)">Level 5 power unlocked: Influence.</b>':''),
+  });
+  await capCheck(p);
+  render();
+}
+
+/* ================= moving voters ================= */
+/* o:{rights:[zi]|null, ownOnly, hint} */
+async function moveVoterFlow(o){
+  const targets=zi=>S.zones.filter(t=>
+    t.idx!==zi&&adjacent(zi,t.idx)&&t.decided==null&&freeCount(t)>0&&
+    (!o.rights||o.rights.includes(zi)||o.rights.includes(t.idx))
+  ).map(t=>t.idx);
+  const valid=(zi,s)=>s.p!=null&&!s.flip&&!s.lock&&(!o.ownOnly||s.p===S.cur)&&targets(zi).length>0;
+  if(!S.zones.some(z=>z.slots.some(s=>valid(z.idx,s)))){toast('No voter can legally be moved.');return null;}
+  const picked=await pickSlot(o.hint,valid);
+  if(!picked)return null;
+  const fz=picked.z,slot=S.zones[fz].slots[picked.s];
+  const tz=await pickZone('Choose the destination zone.',z=>targets(fz).includes(z.idx));
+  if(tz==null)return null;
+  const z=S.zones[tz],nf=freeNormal(z).length,vf=freeVol(z).length;
+  let vol=false;
+  if(nf&&vf)vol=await modal({title:'Which spot?',body:'Volatile spots drop a Headline at round end and lock the voter forever.',buttons:[{label:'Normal spot',value:false},{label:'Volatile ⚫',value:true}]});
+  else vol=vf>0;
+  const dest=(vol?freeVol(z):freeNormal(z))[0];
+  dest.p=slot.p;slot.p=null;
+  if(vol){
+    dest.lock=true;
+    S.pending.push({p:dest.p,z:tz});
+    log(`⚫ ${S.players[dest.p].name}'s voter lands in a volatile area of ${z.name}!`);
+  }
+  checkMajority(tz);
+  return {from:fz,to:tz,who:dest.p};
+}
+
+async function gerrymander(){
+  const p=cp();
+  if(S.flags.gerry)return toast('You already gerrymandered this turn.');
+  const rights=rightsZones(S.cur);
+  if(!rights.length)return toast('No gerrymandering rights: you must ALONE hold the most votes in a zone (ties give nobody rights).');
+  const r=await moveVoterFlow({rights,hint:'Gerrymander: pick any blank voter to move into or out of a zone you dominate.'});
+  if(r){
+    S.flags.gerry=true;
+    log(`🗺️ ${p.name} gerrymanders a ${S.players[r.who].name} voter: ${S.zones[r.from].name} → ${S.zones[r.to].name}.`);
+    render();
+  }
+}
+
+/* ================= trade & powers ================= */
+async function trade(){
+  const p=cp();
+  const oi=await pickPlayer('Trade with which rival?',S.cur);
+  if(oi==null)return;
+  const o=S.players[oi];
+  const give=await pickRes({title:`${p.name} gives…`,min:1,limit:id=>p.res[id],cancellable:true});
+  if(!give)return;
+  const get=await pickRes({title:`${p.name} asks from ${o.name}…`,desc:'Donations are illegal in Shashn — both sides must give at least one resource.',min:1,limit:id=>o.res[id],cancellable:true});
+  if(!get)return;
+  const ok=await modal({title:`${o.name}, do you accept?`,body:`You give ${fmtRes(get)} and receive ${fmtRes(give)}.`,buttons:[{label:'Refuse',value:false},{label:'Accept',value:true,cls:'btn primary'}]});
+  if(!ok){toast('Trade refused.');return;}
+  lose(p,give);gain(o,give);lose(o,get);gain(p,get);
+  log(`🤝 ${p.name} ⇄ ${o.name}: ${fmtRes(give)} for ${fmtRes(get)}.`);
+  await capCheck(o);await capCheck(p);
+  render();
+}
+
+async function exchangePower(){
+  const p=cp();
+  if(maxLevel(p)<3)return toast('Reach level 3 in any ideologue to unlock this.');
+  if(S.flags.p3)return toast('Backroom Exchange already used this turn.');
+  const opts=RES.filter(r=>p.res[r.id]>=2);
+  if(!opts.length)return toast('You need 2 identical resources to pay.');
+  const pay=await modal({title:'🔁 Backroom Exchange (Lv 3)',body:'Pay 2 identical resources to the reserve, take 1 of your choice.',
+    buttons:[...opts.map(r=>({label:`Pay 2 ${r.icon}`,value:r.id})),{label:'Cancel',value:null}]});
+  if(!pay)return;
+  const g=await pickRes({title:'Take 1 resource',min:1,max:1,cancellable:true});
+  if(!g)return;
+  p.res[pay]-=2;gain(p,g);
+  S.flags.p3=true;
+  log(`${p.name} uses Backroom Exchange: 2 ${RESBY[pay].icon} → ${fmtRes(g)}.`);
+  render();
+}
+
+async function influencePower(){
+  const p=cp();
+  if(maxLevel(p)<5)return toast('Reach level 5 in any ideologue to unlock this.');
+  if(S.flags.p5)return toast('Influence already used this turn.');
+  const r=await moveVoterFlow({rights:null,ownOnly:true,hint:'Influence (Lv 5): move one of YOUR blank voters to an adjacent zone.'});
+  if(r){
+    S.flags.p5=true;
+    log(`✨ ${p.name} uses Influence: voter moves ${S.zones[r.from].name} → ${S.zones[r.to].name}.`);
+    render();
+  }
+}
+
+/* ================= conspiracies ================= */
+async function buyConsp(i){
+  const p=cp(),c=S.offer[i];
+  if(!c)return;
+  if(S.flags.consp)return toast('One conspiracy purchase per turn.');
+  if(rsum(p.res)<c.cost)return toast(`You need ${c.cost} resources (any mix).`);
+  const pay=await pickRes({title:`Buy "${c.name}" — pay ${c.cost} resources (any mix)`,desc:c.desc,min:c.cost,max:c.cost,limit:id=>p.res[id],cancellable:true});
+  if(!pay)return;
+  lose(p,pay);
+  p.hand.push(c);
+  S.offer[i]=draw(S.decks.consp,S.decks.conspDis);
+  S.flags.consp=true;
+  log(`🕵️ ${p.name} buys the "${c.name}" conspiracy for ${fmtRes(pay)}.`);
+  render();
+}
+
+async function playConsp(i){
+  const p=cp(),c=p.hand[i];
+  let done=false;
+  switch(c.id){
+    case 'warchest':{
+      const g=await pickRes({title:'War Chest: take 3 resources',min:3,max:3,cancellable:true});
+      if(g){gain(p,g);await capCheck(p);done=true;}
+      break;
+    }
+    case 'recount':{
+      done=!!(await moveVoterFlow({rights:null,hint:'Recount: move any blank, unlocked voter to an adjacent zone.'}));
+      break;
+    }
+    case 'blackout':{
+      const t=await pickPlayer('Blackout which rival?',S.cur);
+      if(t!=null){S.players[t].noGerry++;toast(`${S.players[t].name} loses their next gerrymander.`);done=true;}
+      break;
+    }
+    case 'fakenews':{
+      const sl=await pickSlot('Fake News: remove one rival blank, unlocked voter.',(zi,s)=>s.p!=null&&s.p!==S.cur&&!s.flip&&!s.lock);
+      if(sl){S.zones[sl.z].slots[sl.s].p=null;done=true;}
+      break;
+    }
+    case 'defect':{
+      const sl=await pickSlot('Defection: one rival blank voter joins your party.',(zi,s)=>s.p!=null&&s.p!==S.cur&&!s.flip&&!s.lock&&S.zones[zi].decided==null);
+      if(sl){S.zones[sl.z].slots[sl.s].p=S.cur;checkMajority(sl.z);done=true;}
+      break;
+    }
+    case 'horse':{
+      const t=await pickPlayer('Steal 2 random resources from whom?',S.cur);
+      if(t!=null){
+        const v=S.players[t],pool=[];
+        RES.forEach(r=>{for(let k=0;k<v.res[r.id];k++)pool.push(r.id);});
+        const got={};
+        for(let k=0;k<2&&pool.length;k++){
+          const j=Math.random()*pool.length|0,id=pool.splice(j,1)[0];
+          v.res[id]--;p.res[id]++;got[id]=(got[id]||0)+1;
+        }
+        toast(`Stolen from ${v.name}: ${fmtRes(got)}`);
+        await capCheck(p);done=true;
+      }
+      break;
+    }
+    case 'sting':{
+      const t=await pickPlayer('Sting which rival?',S.cur);
+      if(t!=null){
+        const v=S.players[t],n=Math.min(3,rsum(v.res));
+        if(n>0){
+          const d=await pickRes({title:`${v.name}: the sting lands — discard ${n}`,min:n,max:n,limit:id=>v.res[id]});
+          lose(v,d);
+        }
+        done=true;
+      }
+      break;
+    }
+    case 'rally':{
+      const zi=await pickZone('Snap Rally: place 2 free voters on normal spots in one zone.',z=>z.decided==null&&freeNormal(z).length>0);
+      if(zi!=null){
+        const n=Math.min(2,freeNormal(S.zones[zi]).length);
+        await placeVoters(S.cur,zi,n,false);
+        checkMajority(zi);done=true;
+      }
+      break;
+    }
+  }
+  if(done){
+    p.hand.splice(i,1);
+    S.decks.conspDis.push(c);
+    log(`🕵️ ${p.name} plays conspiracy: ${c.name}.`);
+    render();
+  }
+}
+
+/* ================= headlines ================= */
+async function headlineEffect(c,pi,zi){
+  const p=S.players[pi],z=S.zones[zi];
+  switch(c.id){
+    case 'scandal':{
+      const n=Math.min(2,rsum(p.res));
+      if(n>0){const d=await pickRes({title:`${p.name}: Scandal! Discard ${n}`,min:n,max:n,limit:id=>p.res[id]});lose(p,d);}
+      break;
+    }
+    case 'probe': p.res.funds=Math.max(0,p.res.funds-3);break;
+    case 'smear': p.res.trust=Math.max(0,p.res.trust-2);break;
+    case 'oped':  p.res.media=Math.max(0,p.res.media-2);break;
+    case 'curfew':p.noGerry++;break;
+    case 'riot':
+      S.players.forEach((pl,k)=>{
+        const s=z.slots.find(s=>s.p===k&&!s.flip&&!s.lock);
+        if(s)s.p=null;
+      });
+      break;
+    case 'crackdown':{
+      const s=z.slots.find(s=>s.p===pi&&!s.flip&&!s.lock);
+      if(s)s.p=null;
+      break;
+    }
+    case 'booth':{
+      const cts=zoneCounts(z);cts[pi]=-1;
+      const m=Math.max(...cts);
+      const tops=cts.map((v,k)=>v===m?k:null).filter(v=>v!=null);
+      if(m>0&&tops.length===1&&freeNormal(z).length>0){
+        freeNormal(z)[0].p=tops[0];
+        checkMajority(zi);
+      }
+      break;
+    }
+    case 'sympathy':{
+      const g=await pickRes({title:`${p.name}: Sympathy Wave — gain 2`,min:2,max:2,cancellable:false});
+      gain(p,g);await capCheck(p);
+      break;
+    }
+    case 'viral': p.res.media+=3;await capCheck(p);break;
+    case 'hero':  p.res.clout+=2;await capCheck(p);break;
+    case 'ground':
+      if(z.decided==null&&freeNormal(z).length>0){
+        freeNormal(z)[0].p=pi;
+        checkMajority(zi);
+      }
+      break;
+  }
+}
+
+async function resolveHeadlines(){
+  if(!S.pending.length)return;
+  for(const pd of S.pending.splice(0)){
+    const c=draw(S.decks.head,S.decks.headDis);
+    if(!c)break;
+    const p=S.players[pd.p],z=S.zones[pd.z];
+    await modal({
+      title:`📰 HEADLINE — ${c.name}`,
+      body:`<i>Dateline: ${z.name}.</i><br>${c.desc}<br>Affects <b style="color:${p.color}">${p.sym} ${p.name}</b>.`,
+      buttons:[{label:'Resolve',value:1,cls:c.bad?'btn danger':'btn primary'}],
+    });
+    await headlineEffect(c,pd.p,pd.z);
+    S.decks.headDis.push(c);
+    log(`📰 "${c.name}" hits ${p.name} in ${z.name}.`);
+    if(S.screen==='end')return;
+  }
+  render();
+}
+
+/* ================= turn flow ================= */
+async function startTurn(){
+  const p=cp();
+  S.flags={ideo:false,gerry:false,consp:false,p3:false,p5:false};
+  if(p.noGerry>0){
+    p.noGerry--;
+    S.flags.gerry=true;
+    log(`🚫 ${p.name} may not gerrymander this turn.`);
+  }
+  const inc={};
+  IDEO.forEach(d=>{
+    const n=Math.floor(p.ideo[d.id].length/2);
+    if(n)inc[d.res]=(inc[d.res]||0)+n;
+  });
+  render();
+  await modal({title:`${p.sym} ${p.name}'s turn`,body:`Round ${S.round}. Pass the device to <b>${p.name}</b>.`,buttons:[{label:'Begin turn',value:1,cls:'btn primary'}]});
+  if(rsum(inc)>0){
+    gain(p,inc);
+    log(`💼 ${p.name} collects ${fmtRes(inc)} from their political platform (1 per 2 ideologue cards).`);
+    toast(`Platform income: ${fmtRes(inc)}`);
+    await capCheck(p);
+  }
+  render();
+}
+
+async function endTurn(){
+  await capCheck(cp());
+  const n=S.players.length,next=(S.cur+1)%n;
+  if(next===S.first){
+    await resolveHeadlines();
+    if(S.screen==='end')return;
+    S.round++;
+  }
+  S.cur=next;
+  startTurn();
+}
+
+function endGame(){S.screen='end';render();}
+
+/* ================= setup / vote / draft flows ================= */
+async function votePhase(names){
+  for(;;){
+    const votes={};
+    for(let i=0;i<names.length;i++){
+      await modal({title:'🗳️ First-player vote',body:`Pass the device to <b>${names[i]}</b>. Nobody may vote for themselves.`,buttons:[{label:`I am ${names[i]}`,value:1,cls:'btn primary'}]});
+      const ch=await modal({title:`${names[i]}, who should go first?`,
+        buttons:names.map((m,j)=>j===i?null:{label:m,value:j}).filter(Boolean)});
+      votes[ch]=(votes[ch]||0)+1;
+    }
+    const tally=names.map((m,j)=>votes[j]?`${m}: ${votes[j]}`:null).filter(Boolean).join(' · ');
+    const max=Math.max(...Object.values(votes));
+    const tops=Object.keys(votes).filter(k=>votes[k]===max).map(Number);
+    if(tops.length===1){
+      await modal({title:'The people have spoken',body:`${tally}<br><b>${names[tops[0]]}</b> goes first.`});
+      return tops[0];
+    }
+    await modal({title:'Tie!',body:`${tally}<br>In case of a tie: vote again.`});
+  }
+}
+
+async function draftPhase(){
+  const n=S.players.length;
+  for(let r=0;r<3;r++){
+    for(let k=0;k<n;k++){
+      const p=S.players[(S.first+k)%n];
+      const g=await pickRes({title:`${p.sym} ${p.name}: pick starting resource ${r+1} of 3`,desc:'In turn order, each player takes a resource chip of their choice from the public reserve.',min:1,max:1});
+      gain(p,g);
+      render();
+    }
+  }
+  log('Starting resources drafted. Let the campaign begin!');
+}
+
+async function runSetup(names){
+  S={screen:'vote',names};
+  render();
+  const first=await votePhase(names);
+  newGame(names);
+  S.first=S.cur=first;
+  log(`${names[first]} is voted first player.`);
+  render();
+  await draftPhase();
+  startTurn();
+}
+
+/* ================= rendering ================= */
+function render(){
+  const app=$('#app');
+  app.innerHTML='';
+  if(S.screen==='setup')return renderSetup(app);
+  if(S.screen==='vote')return renderVote(app);
+  if(S.screen==='end')return renderEnd(app);
+  renderGame(app);
+}
+
+function renderSetup(app){
+  const w=el('div','setup');
+  w.append(el('h1',null,'SHASHN'));
+  w.append(el('div','tag','शासन — the strategy game of votes, money and beautifully bad intentions'));
+  const lc=el('label',null,'Number of candidates');
+  const sel=el('select');
+  [3,4,5].forEach(n=>{const o=el('option',null,`${n} players`);o.value=n;sel.append(o);});
+  const inputs=el('div');
+  const buildInputs=()=>{
+    inputs.innerHTML='';
+    for(let i=0;i<+sel.value;i++){
+      inputs.append(el('label',null,`Candidate ${i+1} ${COLORS[i].sym}`));
+      const inp=el('input');
+      inp.placeholder=`Player ${i+1}`;
+      inp.maxLength=14;
+      inputs.append(inp);
+    }
+  };
+  sel.onchange=buildInputs;
+  const start=el('button','btn primary start','Call the Election →');
+  start.onclick=()=>{
+    const names=[...inputs.querySelectorAll('input')].map((inp,i)=>inp.value.trim()||`Player ${i+1}`);
+    runSetup(names);
+  };
+  w.append(lc,sel,inputs,start);
+  app.append(w);
+  buildInputs();
+}
+
+function renderVote(app){
+  const w=el('div','lobby');
+  w.append(el('h1',null,'🗳️ Electing the first player'));
+  w.append(el('p',null,'Everyone votes for who begins. You cannot vote for yourself. Ties are re-voted.'));
+  app.append(w);
+}
+
+function zoneEl(z){
+  const d=el('div','zone'+(z.decided!=null?' decided':''));
+  if(S.pick&&S.pick.type==='zone'&&S.pick.filter(z)){
+    d.classList.add('pickable');
+    d.onclick=()=>endPick(z.idx);
+  }
+  const head=el('div','z-head');
+  head.append(el('span','z-name',z.name),el('span','z-nums',`${z.maj}<small>/${z.total}</small>`));
+  d.append(head);
+  const slots=el('div','z-slots');
+  z.slots.forEach((s,i)=>{
+    const sp=el('span','slot'+(s.vol?' vol':'')+(s.p!=null?' filled':'')+(s.flip?' flip':'')+(s.lock?' lock':''));
+    if(s.p!=null){
+      sp.style.background=S.players[s.p].color;
+      if(s.flip)sp.textContent=S.players[s.p].sym;
+    }
+    if(S.pick&&S.pick.type==='slot'&&S.pick.filter(z.idx,s)){
+      sp.classList.add('pickable');
+      sp.onclick=e=>{e.stopPropagation();endPick({z:z.idx,s:i});};
+    }
+    slots.append(sp);
+  });
+  d.append(slots);
+  if(z.decided!=null){
+    const w=S.players[z.decided];
+    d.append(el('div','z-owner',`${w.sym} ${w.name} holds the majority (+${z.maj} pts)`));
+  }
+  return d;
+}
+
+function renderGame(app){
+  const head=el('header','top');
+  head.append(el('h1',null,'SHASHN'));
+  head.append(el('span','sub',`Round ${S.round} · First player ★ ${S.players[S.first].name} · ⚫ = volatile area`));
+  head.append(el('div','spacer'));
+  const help=el('button','btn small','📖 Rules');
+  help.onclick=showRules;
+  head.append(help);
+  app.append(head);
+
+  const wrap=el('div','game');
+  const board=el('div','board');
+  S.zones.forEach(z=>board.append(zoneEl(z)));
+
+  const side=el('div','side'+(S.pick?' noclick':''));
+  side.append(curPanel(),marketPanel(),playersPanel(),logPanel());
+  wrap.append(board,side);
+  app.append(wrap);
+
+  if(S.pick){
+    const hb=el('div','hintbar');
+    hb.append(el('span',null,S.pick.hint));
+    const c=el('button','btn small','Cancel');
+    c.onclick=()=>endPick(null);
+    hb.append(c);
+    app.append(hb);
+  }
+}
+
+function curPanel(){
+  const p=cp(),pan=el('div','panel');
+  const nm=el('div','cur-name');
+  const dot=el('span','dot');dot.style.background=p.color;
+  nm.append(dot,el('span',null,`${p.sym} ${p.name}`),el('span','sub',S.cur===S.first?'★':''));
+  pan.append(nm);
+  pan.append(el('div','cur-score',`Majority points: ${p.score} · Resources: ${rsum(p.res)}/12`));
+
+  const chips=el('div','chips');
+  RES.forEach(r=>chips.append(el('span','chip',`${r.icon} <b>${p.res[r.id]}</b>`)));
+  pan.append(chips);
+
+  const ideos=el('div','ideos');
+  IDEO.forEach(d=>{
+    const lvl=p.ideo[d.id].length;
+    const iv=el('div','ideo',`${d.icon} ${d.name}<span class="lv">${lvl}</span>`);
+    if(lvl>=3)iv.append(el('span','pw',lvl>=5?'Lv3+Lv5':'Lv3'));
+    ideos.append(iv);
+  });
+  pan.append(ideos);
+
+  const acts=el('div','actions');
+  const mk=(label,fn,dis,cls)=>{
+    const b=el('button','btn'+(cls?' '+cls:''),label);
+    b.disabled=!!dis;b.onclick=fn;
+    return b;
+  };
+  acts.append(mk('📜 Ideology Question',answerIdeology,S.flags.ideo));
+  acts.append(mk('🗺️ Gerrymander',gerrymander,S.flags.gerry));
+  acts.append(mk('🤝 Trade',trade,S.players.length<2));
+  acts.append(mk('🔁 Exchange (Lv3)',exchangePower,maxLevel(p)<3||S.flags.p3));
+  acts.append(mk('✨ Influence (Lv5)',influencePower,maxLevel(p)<5||S.flags.p5));
+  acts.append(mk('⏭️ End Turn',endTurn,false,'danger'));
+  pan.append(acts);
+
+  if(p.hand.length){
+    const h=el('div','hand');
+    h.append(el('h3',null,`Your conspiracies (${p.hand.length}) — hidden from rivals`));
+    p.hand.forEach((c,i)=>{
+      const hc=el('div','hcard');
+      hc.append(el('span','nm',c.name),el('span',null,c.desc));
+      const b=el('button','btn small','Play');
+      b.onclick=()=>playConsp(i);
+      hc.append(b);
+      h.append(hc);
+    });
+    pan.append(h);
+  }
+  return pan;
+}
+
+function marketPanel(){
+  const pan=el('div','panel'),p=cp();
+  pan.append(el('h3',null,'Voter cards — pay the reserve, place immediately, redraw'));
+  const row=el('div','mrow');
+  S.market.forEach((c,i)=>{
+    if(!c)return;
+    const v=el('div','vcard'+(canPay(p,c.cost)?'':' cant'));
+    v.append(el('div','sz','🧍'.repeat(c.size)));
+    v.append(el('div','cost',RES.filter(r=>c.cost[r.id]).map(r=>`${c.cost[r.id]}${r.icon}`).join(' ')));
+    v.onclick=()=>buyVoter(i);
+    row.append(v);
+  });
+  pan.append(row);
+  pan.append(el('h3',null,'Conspiracy cards — 1 purchase/turn, play now or later'));
+  const crow=el('div','mrow');
+  S.offer.forEach((c,i)=>{
+    if(!c)return;
+    const cd=el('div','ccard'+(rsum(p.res)>=c.cost&&!S.flags.consp?'':' cant'));
+    cd.append(el('div','nm',`${c.name} <span class="cost">· ${c.cost} any resources</span>`));
+    cd.append(el('div',null,c.desc));
+    cd.onclick=()=>buyConsp(i);
+    crow.append(cd);
+  });
+  pan.append(crow);
+  return pan;
+}
+
+function playersPanel(){
+  const pan=el('div','panel');
+  pan.append(el('h3',null,'Candidates'));
+  S.players.forEach((p,i)=>{
+    const r=el('div','prow'+(i===S.cur?' active':''));
+    const dot=el('span','dot');dot.style.background=p.color;
+    r.append(dot,el('span','nm',`${p.sym} ${p.name}${i===S.first?' ★':''}`));
+    r.append(el('span',null,`${p.score} pts`));
+    r.append(el('span','mini',`${rsum(p.res)} res · ${p.hand.length} 🕵️ · ${IDEO.map(d=>`${d.icon}${p.ideo[d.id].length}`).join(' ')}`));
+    pan.append(r);
+  });
+  return pan;
+}
+
+function logPanel(){
+  const pan=el('div','panel logpanel');
+  pan.append(el('h3',null,'Campaign trail'));
+  const e=el('div','entries');
+  [...S.log].reverse().slice(0,40).forEach(l=>e.append(el('div',null,l)));
+  pan.append(e);
+  return pan;
+}
+
+function showRules(){
+  modal({title:'📖 How Shashn works',body:`<div class="rules">
+    <h4>Objective</h4>
+    <p>Win when you hold the biggest majority. Each zone shows <b>needed/total</b> votes (e.g. North-West 6/11: 11 seats, 6 for majority). The instant you reach the majority number, you score that many points and your tokens flip from blank to your party symbol. When all 9 zones are decided, the highest score wins.</p>
+    <h4>On your turn</h4>
+    <ul>
+      <li><b>Ideology question</b> (once): only the question and answers are read to you — the ideologue and reward stay hidden. The card levels up that ideologue; every turn you earn 1 resource per 2 cards of an ideologue (🏦 Capitalist→💰, 👑 Supremo→✊, 🎤 Showstopper→📺, 🕊️ Idealist→🤝). Level 3 and 5 unlock powers.</li>
+      <li><b>Voter cards</b> (1/2/3 voters): pay the printed resources to the public reserve, place ALL voters in ONE zone immediately, then redraw. Voters start blank-side up.</li>
+      <li><b>Gerrymander</b> (once): if you ALONE have the most votes in a zone (ties: nobody), move one blank voter between that zone and an adjacent one. Big zones (15+) reach diagonally. Majority (flipped) voters can never be gerrymandered. <i>Pro tip: when you can gerrymander, gerrymander.</i></li>
+      <li><b>Trade</b>: resources may be traded, never donated — both sides give something.</li>
+      <li><b>Conspiracies</b> (buy 1/turn, 4–5 any resources): keep hidden, play now or later to help yourself or slow a rival.</li>
+    </ul>
+    <h4>Volatile areas ⚫</h4>
+    <p>11 black-circle spots. A voter entering one drops a <b>Headline</b> (resolved at round end, usually bad) and is locked forever — it cannot be moved, gerrymandered or discarded.</p>
+    <h4>Limits</h4>
+    <p>Hold at most <b>12 resources</b> — discard extras immediately.</p>
+  </div>`,buttons:[{label:'Back to the campaign',value:1,cls:'btn primary'}]});
+}
+
+function renderEnd(app){
+  const w=el('div','endwrap');
+  const ranked=[...S.players].sort((a,b)=>b.score-a.score);
+  const top=ranked[0].score;
+  const winners=ranked.filter(p=>p.score===top);
+  w.append(el('h1',null,'🏛️ The results are in'));
+  w.append(el('p',null,winners.length===1
+    ?`<b style="color:${winners[0].color}">${winners[0].sym} ${winners[0].name}</b> wins with ${top} majority votes!`
+    :`It's a coalition: ${winners.map(p=>p.sym+' '+p.name).join(' & ')} share power with ${top} majority votes each.`));
+  const st=el('div','stand');
+  ranked.forEach((p,i)=>{
+    const r=el('div','prow');
+    const dot=el('span','dot');dot.style.background=p.color;
+    r.append(el('span',null,`${i+1}.`),dot,el('span','nm',`${p.sym} ${p.name}`));
+    r.append(el('span','pts',`${p.score} majority votes`));
+    st.append(r);
+  });
+  w.append(st);
+  const again=el('button','btn primary start','New Election');
+  again.style.marginTop='20px';
+  again.onclick=()=>location.reload();
+  w.append(again);
+  app.append(w);
+}
+
+/* ================= boot ================= */
+render();
+</script>
+</body>
+</html>
