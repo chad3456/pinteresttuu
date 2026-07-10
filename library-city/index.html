@@ -115,6 +115,16 @@
   #rd-fill{height:100%;width:0%;background:var(--brass);transition:width .3s}
   .loading-dot{display:inline-block;animation:ldot 1.1s ease-in-out infinite}
   @keyframes ldot{0%,100%{opacity:.3}50%{opacity:1}}
+  .reading-room{max-width:420px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+  .rr-orn{font-size:34px;color:var(--brass);opacity:.8}
+  .rr-lead{font-family:var(--serif);font-size:17px;line-height:1.7;color:#4a4130}
+  .rr-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .rr-btn{font-family:var(--sans);font-weight:700;font-size:14px;letter-spacing:.02em;
+    background:var(--brass);color:#241a06;border-radius:12px;padding:14px 24px;text-decoration:none;
+    box-shadow:0 10px 30px rgba(216,169,78,.35);transition:transform .18s}
+  .rr-btn:hover{transform:translateY(-2px)}
+  .rr-btn.ghost{background:transparent;color:#6a5a38;border:1.5px solid rgba(120,100,60,.5);box-shadow:none}
+  .rr-fine{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#8a7c5c}
 
   /* ---------- mobile controls ---------- */
   #joy{position:fixed;left:26px;bottom:80px;z-index:26;width:110px;height:110px;border-radius:50%;
@@ -273,15 +283,27 @@ catch(e){
 }
 renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
 renderer.setSize(innerWidth,innerHeight);
+try{renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap}catch(e){}
 $("#gl").appendChild(renderer.domElement);
 var scene=new THREE.Scene();
-scene.background=new THREE.Color(0x0b0e14);
-scene.fog=new THREE.FogExp2(0x0b0e14,0.016);
-var camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,300);
+scene.background=new THREE.Color(0x080b12);
+scene.fog=new THREE.FogExp2(0x090c15,0.0145);
+var camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,300);
 
-scene.add(new THREE.AmbientLight(0x5a6a9a,.75));
-var moonL=new THREE.DirectionalLight(0x9fb2dd,.8);moonL.position.set(-40,60,-30);scene.add(moonL);
-var warmL=new THREE.DirectionalLight(0xd8a94e,.28);warmL.position.set(30,20,40);scene.add(warmL);
+scene.add(new THREE.AmbientLight(0x40506e,.5));
+scene.add(new THREE.HemisphereLight(0x9fb2dd,0x141824,.55));
+var moonL=new THREE.DirectionalLight(0xc4d4f2,1.1);
+moonL.position.set(-46,66,-30);
+try{
+  moonL.castShadow=true;
+  moonL.shadow.mapSize.set(2048,2048);
+  moonL.shadow.camera.near=12;moonL.shadow.camera.far=230;
+  moonL.shadow.camera.left=-95;moonL.shadow.camera.right=95;
+  moonL.shadow.camera.top=95;moonL.shadow.camera.bottom=-95;
+  moonL.shadow.bias=-0.0006;moonL.shadow.normalBias=0.05;
+}catch(e){}
+scene.add(moonL);
+var warmL=new THREE.DirectionalLight(0xe0a24e,.3);warmL.position.set(34,22,42);scene.add(warmL);
 
 function ctex(w,h,fn){
   var cv=document.createElement("canvas");cv.width=w;cv.height=h;
@@ -294,6 +316,99 @@ var glowTex=ctex(128,128,function(c,w,h){
   g.addColorStop(0,"rgba(255,224,150,1)");g.addColorStop(.4,"rgba(255,200,110,.32)");g.addColorStop(1,"rgba(255,200,110,0)");
   c.fillStyle=g;c.fillRect(0,0,w,h);
 });
+
+/* ---- gradient night sky + image-based lighting (advanced) ---- */
+(function(){
+  var sky=ctex(1024,512,function(c,w,h){
+    var g=c.createLinearGradient(0,0,0,h);
+    g.addColorStop(0.00,"#05070e");
+    g.addColorStop(0.46,"#0a1020");
+    g.addColorStop(0.70,"#141d33");
+    g.addColorStop(0.86,"#28324e");
+    g.addColorStop(1.00,"#3d4664");
+    c.fillStyle=g;c.fillRect(0,0,w,h);
+    /* soft moon bloom baked into the dome */
+    var mg=c.createRadialGradient(w*0.2,h*0.24,6,w*0.2,h*0.24,150);
+    mg.addColorStop(0,"rgba(200,214,240,.5)");mg.addColorStop(1,"rgba(200,214,240,0)");
+    c.fillStyle=mg;c.fillRect(0,0,w,h);
+  });
+  sky.mapping=THREE.EquirectangularReflectionMapping;
+  scene.background=sky;
+  try{
+    var pg=new THREE.PMREMGenerator(renderer);
+    scene.environment=pg.fromEquirectangular(sky).texture;
+    pg.dispose();
+  }catch(e){}
+})();
+
+/* ================= bloom post-processing (custom, core-only) ================= */
+var postfx=(function(){
+  try{
+    var vert=["varying vec2 vUv;","void main(){vUv=uv;gl_Position=vec4(position.xy,0.0,1.0);}"].join("\n");
+    function mat(frag,uni){return new THREE.ShaderMaterial({uniforms:uni,vertexShader:vert,fragmentShader:frag,depthTest:false,depthWrite:false})}
+    var brightMat=mat([
+      "uniform sampler2D tD;uniform float thr;varying vec2 vUv;",
+      "void main(){vec3 c=texture2D(tD,vUv).rgb;",
+      "float l=dot(c,vec3(0.2126,0.7152,0.0722));",
+      "float k=smoothstep(thr,thr+0.4,l);",
+      "gl_FragColor=vec4(c*k,1.0);}"].join("\n"),
+      {tD:{value:null},thr:{value:0.62}});
+    var blurMat=mat([
+      "uniform sampler2D tD;uniform vec2 dir;varying vec2 vUv;",
+      "void main(){float w0=0.227027,w1=0.1945946,w2=0.1216216,w3=0.054054,w4=0.016216;",
+      "vec3 s=texture2D(tD,vUv).rgb*w0;",
+      "s+=texture2D(tD,vUv+dir*1.0).rgb*w1;s+=texture2D(tD,vUv-dir*1.0).rgb*w1;",
+      "s+=texture2D(tD,vUv+dir*2.0).rgb*w2;s+=texture2D(tD,vUv-dir*2.0).rgb*w2;",
+      "s+=texture2D(tD,vUv+dir*3.0).rgb*w3;s+=texture2D(tD,vUv-dir*3.0).rgb*w3;",
+      "s+=texture2D(tD,vUv+dir*4.0).rgb*w4;s+=texture2D(tD,vUv-dir*4.0).rgb*w4;",
+      "gl_FragColor=vec4(s,1.0);}"].join("\n"),
+      {tD:{value:null},dir:{value:new THREE.Vector2()}});
+    var compMat=mat([
+      "uniform sampler2D tScene;uniform sampler2D tBloom;uniform float strength;varying vec2 vUv;",
+      "vec3 aces(vec3 x){return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0);}",
+      "void main(){",
+      "vec3 c=texture2D(tScene,vUv).rgb;",
+      "vec3 b=texture2D(tBloom,vUv).rgb;",
+      "c+=b*strength;",
+      "vec2 q=vUv-0.5;float vig=smoothstep(0.95,0.32,length(q));",
+      "c*=mix(0.68,1.0,vig);",
+      "c=aces(c*1.12);",
+      "c=pow(c,vec3(1.0/2.2));",
+      "gl_FragColor=vec4(c,1.0);}"].join("\n"),
+      {tScene:{value:null},tBloom:{value:null},strength:{value:0.82}});
+    var qscene=new THREE.Scene();
+    var qcam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    var quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),brightMat);
+    qscene.add(quad);
+    var dpr=renderer.getPixelRatio();
+    var sceneRT,brightRT,blurA,blurB;
+    function makeRT(w,h){return new THREE.WebGLRenderTarget(Math.max(1,w),Math.max(1,h),
+      {minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter})}
+    function alloc(){
+      var w=Math.floor(innerWidth*dpr),h=Math.floor(innerHeight*dpr);
+      sceneRT=makeRT(w,h);brightRT=makeRT(w>>1,h>>1);blurA=makeRT(w>>1,h>>1);blurB=makeRT(w>>1,h>>1);
+    }
+    alloc();
+    function pass(m,target){quad.material=m;renderer.setRenderTarget(target);renderer.render(qscene,qcam)}
+    function render(sc,cam){
+      renderer.setRenderTarget(sceneRT);renderer.render(sc,cam);
+      brightMat.uniforms.tD.value=sceneRT.texture;pass(brightMat,brightRT);
+      var bw=brightRT.width,bh=brightRT.height;
+      blurMat.uniforms.tD.value=brightRT.texture;blurMat.uniforms.dir.value.set(1/bw,0);pass(blurMat,blurA);
+      blurMat.uniforms.tD.value=blurA.texture;blurMat.uniforms.dir.value.set(0,1/bh);pass(blurMat,blurB);
+      blurMat.uniforms.tD.value=blurB.texture;blurMat.uniforms.dir.value.set(2.0/bw,0);pass(blurMat,blurA);
+      blurMat.uniforms.tD.value=blurA.texture;blurMat.uniforms.dir.value.set(0,2.0/bh);pass(blurMat,blurB);
+      compMat.uniforms.tScene.value=sceneRT.texture;compMat.uniforms.tBloom.value=blurB.texture;
+      quad.material=compMat;renderer.setRenderTarget(null);renderer.render(qscene,qcam);
+    }
+    function resize(){
+      sceneRT.dispose();brightRT.dispose();blurA.dispose();blurB.dispose();alloc();
+    }
+    return {render:render,resize:resize,ok:true};
+  }catch(e){
+    return {render:function(s,c){renderer.setRenderTarget(null);renderer.render(s,c)},resize:function(){},ok:false};
+  }
+})();
 
 /* ================= city layout ================= */
 var BLOCK=34, ROAD=12, CITY_W=3*BLOCK+2*ROAD, CITY_D=2*BLOCK+ROAD;
@@ -308,7 +423,7 @@ var groundTex=ctex(1024,768,function(c,w,h){
     c.fillRect(r()*w,r()*h,1.5,1.5)}
   function road(x,y,rw,rh){
     c.fillStyle="#0e1118";c.fillRect(x,y,rw,rh);
-    c.strokeStyle="rgba(216,169,78,.5)";c.lineWidth=3;c.setLineDash([26,20]);
+    c.strokeStyle="rgba(216,169,78,.28)";c.lineWidth=3;c.setLineDash([26,20]);
     c.beginPath();
     if(rw>rh){c.moveTo(x,y+rh/2);c.lineTo(x+rw,y+rh/2)}
     else{c.moveTo(x+rw/2,y);c.lineTo(x+rw/2,y+rh)}
@@ -320,7 +435,7 @@ var groundTex=ctex(1024,768,function(c,w,h){
   road(0,bh,w,rh);
 });
 var ground=new THREE.Mesh(new THREE.PlaneGeometry(CITY_W,CITY_D),
-  new THREE.MeshStandardMaterial({map:groundTex,roughness:.92}));
+  new THREE.MeshStandardMaterial({map:groundTex,roughness:.62,metalness:.18,envMapIntensity:.4}));
 ground.rotation.x=-Math.PI/2;scene.add(ground);
 /* surrounding dark plain */
 var plain=new THREE.Mesh(new THREE.PlaneGeometry(400,400),
@@ -724,10 +839,19 @@ function loadBook(book){
       if(curBook!==book)return;
       var page=$("#rd-page");
       page.className="center";
-      page.innerHTML="The library's archive can't be reached from inside this sandbox.<br><br>"+
-        "Open this app from the repository (or any hosting) and the whole book streams in right here.<br><br>"+
-        "Or read it now: <a href='https://www.gutenberg.org/ebooks/"+book.id+"' target='_blank' rel='noopener'>gutenberg.org/ebooks/"+book.id+" ↗</a>";
-      $("#rd-pos").textContent="offline";
+      page.innerHTML=
+        "<div class='reading-room'>"+
+          "<div class='rr-orn'>\u2766</div>"+
+          "<p class='rr-lead'>The complete text streams straight into this reader when Alexandria runs on the web. From here, open the real thing in a new tab \u2014 free, unabridged, public domain.</p>"+
+          "<div class='rr-cta'>"+
+            "<a class='rr-btn' href='https://www.gutenberg.org/ebooks/"+book.id+".html.images' target='_blank' rel='noopener'>Read the full book \u2197</a>"+
+            "<a class='rr-btn ghost' href='https://www.gutenberg.org/ebooks/"+book.id+".epub3.images' target='_blank' rel='noopener'>Download EPUB \u2197</a>"+
+          "</div>"+
+          "<p class='rr-fine'>Project Gutenberg \u00b7 no account \u00b7 no cost</p>"+
+        "</div>";
+      $("#rd-pos").textContent="preview";
+      $("#rd-fill").style.width="0%";
+      $("#rd-prev").disabled=$("#rd-next").disabled=$("#rd-first").disabled=$("#rd-last").disabled=true;
       return;
     }
     fetch(urls[k]).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(txt){
@@ -860,13 +984,26 @@ function frame(){
   updateNearest();
   updateDistrict();
   drawMap();
-  renderer.render(scene,camera);
+  postfx.render(scene,camera);
 }
 window.addEventListener("resize",function(){
   camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);
+  postfx.resize();
 });
+/* enable shadow casting/receiving across the built city */
+try{
+  scene.traverse(function(o){
+    if(o.isMesh){
+      var flat=o.geometry&&o.geometry.type==="PlaneGeometry";
+      o.castShadow=!flat;o.receiveShadow=true;
+    }
+  });
+  ground.castShadow=false;ground.receiveShadow=true;
+  plain.castShadow=false;plain.receiveShadow=true;
+  moon.castShadow=false;
+}catch(e){}
 camera.position.set(0,26,34);
 camera.lookAt(0,0,0);
 frame();
