@@ -115,7 +115,23 @@
   #rd-fill{height:100%;width:0%;background:var(--brass);transition:width .3s}
   .loading-dot{display:inline-block;animation:ldot 1.1s ease-in-out infinite}
   @keyframes ldot{0%,100%{opacity:.3}50%{opacity:1}}
-  .reading-room{max-width:420px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+  #prompt{display:none!important}
+  #rd-epub,#rd-more{display:none!important}
+  #ebubble{position:fixed;left:0;top:0;z-index:26;pointer-events:none;
+    display:flex;flex-direction:column;align-items:center;gap:7px;opacity:0;transition:opacity .18s ease}
+  #ebubble.show{opacity:1}
+  #ebubble .eb-key{width:46px;height:46px;border-radius:13px;
+    background:#f4e7c6;border:3px solid #b98a4a;color:#7a5626;
+    display:grid;place-items:center;font-family:var(--serif);font-weight:800;font-size:23px;
+    box-shadow:0 5px 0 rgba(120,86,38,.45),0 12px 22px rgba(0,0,0,.28);
+    animation:ebbob 1.5s ease-in-out infinite}
+  @keyframes ebbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  #ebubble .eb-title{font-family:var(--serif);font-size:14.5px;color:#4a3a1e;
+    background:#f7edd4;border:2px solid #c8aa6a;border-radius:11px;padding:5px 14px;max-width:60vw;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    box-shadow:0 5px 12px rgba(90,66,30,.28)}
+  .rr-sub{font-family:var(--sans);font-size:13px;line-height:1.7;color:#6a5c40;max-width:38ch}
+  .reading-room{max-width:440px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
   .rr-orn{font-size:34px;color:var(--brass);opacity:.8}
   .rr-lead{font-family:var(--serif);font-size:17px;line-height:1.7;color:#4a4130}
   .rr-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
@@ -159,6 +175,8 @@
   <kbd>E</kbd>
   <span class="pt">Read <b id="prompt-title">—</b></span>
 </div>
+
+<div id="ebubble" aria-hidden="true"><div class="eb-key">E</div><div class="eb-title"></div></div>
 
 <div id="controls-hint">
   <b>W A S D</b> walk &nbsp;·&nbsp; <b>SHIFT</b> run &nbsp;·&nbsp; drag to look &nbsp;·&nbsp;
@@ -286,29 +304,31 @@ renderer.setSize(innerWidth,innerHeight);
 try{renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap}catch(e){}
 $("#gl").appendChild(renderer.domElement);
 var scene=new THREE.Scene();
-scene.background=new THREE.Color(0x080b12);
-scene.fog=new THREE.FogExp2(0x090c15,0.0145);
-var camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,300);
+scene.background=new THREE.Color(0xf3ead2);
+scene.fog=new THREE.FogExp2(0xe4e8c6,0.0026);
+var camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,300);
 
-scene.add(new THREE.AmbientLight(0x40506e,.5));
-scene.add(new THREE.HemisphereLight(0x9fb2dd,0x141824,.55));
-var moonL=new THREE.DirectionalLight(0xc4d4f2,1.1);
-moonL.position.set(-46,66,-30);
+scene.add(new THREE.AmbientLight(0xffeecb,.4));
+scene.add(new THREE.HemisphereLight(0xfff2da,0x7f9a50,.6));
+var moonL=new THREE.DirectionalLight(0xffedc4,1.35);
+moonL.position.set(-34,56,30);
 try{
   moonL.castShadow=true;
   moonL.shadow.mapSize.set(2048,2048);
   moonL.shadow.camera.near=12;moonL.shadow.camera.far=230;
   moonL.shadow.camera.left=-95;moonL.shadow.camera.right=95;
   moonL.shadow.camera.top=95;moonL.shadow.camera.bottom=-95;
-  moonL.shadow.bias=-0.0006;moonL.shadow.normalBias=0.05;
+  moonL.shadow.bias=-0.0005;moonL.shadow.normalBias=0.04;
 }catch(e){}
 scene.add(moonL);
-var warmL=new THREE.DirectionalLight(0xe0a24e,.3);warmL.position.set(34,22,42);scene.add(warmL);
+var warmL=new THREE.DirectionalLight(0xbfe4ff,.28);warmL.position.set(30,24,-40);scene.add(warmL);
 
 function ctex(w,h,fn){
   var cv=document.createElement("canvas");cv.width=w;cv.height=h;
   fn(cv.getContext("2d"),w,h);
-  var t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;
+  var t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;
+  try{t.anisotropy=Math.min(16,renderer.capabilities.getMaxAnisotropy())}catch(e){t.anisotropy=8}
+  return t;
 }
 function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 var glowTex=ctex(128,128,function(c,w,h){
@@ -321,15 +341,14 @@ var glowTex=ctex(128,128,function(c,w,h){
 (function(){
   var sky=ctex(1024,512,function(c,w,h){
     var g=c.createLinearGradient(0,0,0,h);
-    g.addColorStop(0.00,"#05070e");
-    g.addColorStop(0.46,"#0a1020");
-    g.addColorStop(0.70,"#141d33");
-    g.addColorStop(0.86,"#28324e");
-    g.addColorStop(1.00,"#3d4664");
+    g.addColorStop(0.00,"#eef0d8");
+    g.addColorStop(0.45,"#f3ead0");
+    g.addColorStop(0.72,"#f6e6c6");
+    g.addColorStop(0.90,"#f2dcb0");
+    g.addColorStop(1.00,"#e9cf9e");
     c.fillStyle=g;c.fillRect(0,0,w,h);
-    /* soft moon bloom baked into the dome */
-    var mg=c.createRadialGradient(w*0.2,h*0.24,6,w*0.2,h*0.24,150);
-    mg.addColorStop(0,"rgba(200,214,240,.5)");mg.addColorStop(1,"rgba(200,214,240,0)");
+    var mg=c.createRadialGradient(w*0.28,h*0.2,10,w*0.28,h*0.2,230);
+    mg.addColorStop(0,"rgba(255,250,225,.85)");mg.addColorStop(1,"rgba(255,250,225,0)");
     c.fillStyle=mg;c.fillRect(0,0,w,h);
   });
   sky.mapping=THREE.EquirectangularReflectionMapping;
@@ -350,9 +369,9 @@ var postfx=(function(){
       "uniform sampler2D tD;uniform float thr;varying vec2 vUv;",
       "void main(){vec3 c=texture2D(tD,vUv).rgb;",
       "float l=dot(c,vec3(0.2126,0.7152,0.0722));",
-      "float k=smoothstep(thr,thr+0.4,l);",
+      "float k=smoothstep(thr,thr+0.5,l);",
       "gl_FragColor=vec4(c*k,1.0);}"].join("\n"),
-      {tD:{value:null},thr:{value:0.62}});
+      {tD:{value:null},thr:{value:0.92}});
     var blurMat=mat([
       "uniform sampler2D tD;uniform vec2 dir;varying vec2 vUv;",
       "void main(){float w0=0.227027,w1=0.1945946,w2=0.1216216,w3=0.054054,w4=0.016216;",
@@ -370,12 +389,12 @@ var postfx=(function(){
       "vec3 c=texture2D(tScene,vUv).rgb;",
       "vec3 b=texture2D(tBloom,vUv).rgb;",
       "c+=b*strength;",
-      "vec2 q=vUv-0.5;float vig=smoothstep(0.95,0.32,length(q));",
-      "c*=mix(0.68,1.0,vig);",
-      "c=aces(c*1.12);",
+      "vec2 q=vUv-0.5;float vig=smoothstep(1.05,0.45,length(q));",
+      "c*=mix(0.82,1.0,vig);",
+      "c=aces(c*vec3(1.05,1.02,0.95));",
       "c=pow(c,vec3(1.0/2.2));",
       "gl_FragColor=vec4(c,1.0);}"].join("\n"),
-      {tScene:{value:null},tBloom:{value:null},strength:{value:0.82}});
+      {tScene:{value:null},tBloom:{value:null},strength:{value:0.4}});
     var qscene=new THREE.Scene();
     var qcam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
     var quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),brightMat);
@@ -417,29 +436,30 @@ function cellOrigin(cx,cz){ /* center of block (cx:0..2, cz:0..1) */
 }
 /* ground with roads */
 var groundTex=ctex(1024,768,function(c,w,h){
-  c.fillStyle="#141a26";c.fillRect(0,0,w,h);
+  var g=c.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,"#72a047");g.addColorStop(1,"#5c8a38");
+  c.fillStyle=g;c.fillRect(0,0,w,h);
   var r=rng(3);
-  for(var i=0;i<2600;i++){c.fillStyle="rgba(255,255,255,"+(r()*0.03)+")";
-    c.fillRect(r()*w,r()*h,1.5,1.5)}
-  function road(x,y,rw,rh){
-    c.fillStyle="#0e1118";c.fillRect(x,y,rw,rh);
-    c.strokeStyle="rgba(216,169,78,.28)";c.lineWidth=3;c.setLineDash([26,20]);
-    c.beginPath();
-    if(rw>rh){c.moveTo(x,y+rh/2);c.lineTo(x+rw,y+rh/2)}
-    else{c.moveTo(x+rw/2,y);c.lineTo(x+rw/2,y+rh)}
-    c.stroke();c.setLineDash([]);
+  for(var i=0;i<6000;i++){var t=r();
+    c.fillStyle=t<.5?"rgba(104,150,66,.6)":(t<.8?"rgba(140,180,96,.5)":"rgba(80,120,52,.6)");
+    c.fillRect(r()*w,r()*h,2+r()*2.5,2+r()*2.5)}
+  function path(x,y,rw,rh){
+    c.fillStyle="#cba876";c.fillRect(x,y,rw,rh);
+    c.fillStyle="#bd975f";
+    for(var k=0;k<320;k++)c.fillRect(x+r()*rw,y+r()*rh,2+r()*3,2+r()*3);
+    c.strokeStyle="rgba(96,70,38,.3)";c.lineWidth=3;c.strokeRect(x+2,y+2,rw-4,rh-4);
   }
   var bw=w*BLOCK/CITY_W, rw=w*ROAD/CITY_W;
   var bh=h*BLOCK/CITY_D, rh=h*ROAD/CITY_D;
-  road(bw,0,rw,h);road(bw*2+rw,0,rw,h);
-  road(0,bh,w,rh);
+  path(bw,0,rw,h);path(bw*2+rw,0,rw,h);
+  path(0,bh,w,rh);
 });
 var ground=new THREE.Mesh(new THREE.PlaneGeometry(CITY_W,CITY_D),
-  new THREE.MeshStandardMaterial({map:groundTex,roughness:.62,metalness:.18,envMapIntensity:.4}));
+  new THREE.MeshStandardMaterial({map:groundTex,roughness:.97,metalness:0,envMapIntensity:.3}));
 ground.rotation.x=-Math.PI/2;scene.add(ground);
 /* surrounding dark plain */
 var plain=new THREE.Mesh(new THREE.PlaneGeometry(400,400),
-  new THREE.MeshStandardMaterial({color:0x0a0d13,roughness:1}));
+  new THREE.MeshStandardMaterial({color:0x6f9c48,roughness:1}));
 plain.rotation.x=-Math.PI/2;plain.position.y=-0.02;scene.add(plain);
 /* moon */
 var moon=new THREE.Mesh(new THREE.CircleGeometry(7,40),new THREE.MeshBasicMaterial({color:0xdfe6f2}));
@@ -447,6 +467,7 @@ moon.position.set(-70,55,-90);moon.lookAt(0,10,0);scene.add(moon);
 var moonHalo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0x9fb2dd,
   blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.5}));
 moonHalo.scale.set(40,40,1);moonHalo.position.copy(moon.position);scene.add(moonHalo);
+moon.visible=false;moonHalo.visible=false;
 /* stars */
 (function(){
   var n=350,pos=new Float32Array(n*3),r=rng(11);
@@ -531,9 +552,9 @@ function streetlamp(x,z){
     new THREE.MeshBasicMaterial({color:0xffe2a8}));
   bulb.position.y=4.6;g.add(bulb);
   var gl2=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc878,
-    blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.8}));
-  gl2.scale.set(5,5,1);gl2.position.y=4.6;g.add(gl2);
-  var l=new THREE.PointLight(0xffc878,1.1,14,1.8);l.position.y=4.4;g.add(l);
+    blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.34}));
+  gl2.scale.set(4,4,1);gl2.position.y=4.6;g.add(gl2);
+  var l=new THREE.PointLight(0xffc878,.5,12,1.8);l.position.y=4.4;g.add(l);
   g.position.set(x,0,z);scene.add(g);
   addCollider(x,z,.35,.35);
 }
@@ -634,25 +655,41 @@ var fireflies=(function(){
     pos[i*3]=(r()-.5)*CITY_W;pos[i*3+1]=.6+r()*3.4;pos[i*3+2]=(r()-.5)*CITY_D;
   }
   var g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));
-  var m=new THREE.PointsMaterial({size:.16,map:glowTex,color:0xffdf9a,
-    transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false});
+  var m=new THREE.PointsMaterial({size:.13,map:glowTex,color:0xfff2c8,
+    transparent:true,opacity:.32,blending:THREE.AdditiveBlending,depthWrite:false});
   var p=new THREE.Points(g,m);scene.add(p);return p;
 })();
 
-/* ================= the reader-citizen (player) ================= */
+/* ================= the reader-citizen (player) — cozy toy style ================= */
 var player=new THREE.Group();
-var bodyMat=new THREE.MeshStandardMaterial({color:0x2e4a6e,roughness:.6});
-var body=new THREE.Mesh(new THREE.CapsuleGeometry(.34,.7,6,12),bodyMat);
-body.position.y=1.05;player.add(body);
-var head=new THREE.Mesh(new THREE.SphereGeometry(.26,14,12),
-  new THREE.MeshStandardMaterial({color:0xe0c3a0,roughness:.7}));
-head.position.y=1.86;player.add(head);
-var scarf=new THREE.Mesh(new THREE.TorusGeometry(.26,.09,8,16),
-  new THREE.MeshStandardMaterial({color:0xd8a94e,roughness:.6}));
-scarf.rotation.x=Math.PI/2;scarf.position.y=1.58;player.add(scarf);
-var legL=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.4,4,8),bodyMat.clone());
-legL.material.color.set(0x1e3048);legL.position.set(-.16,.4,0);player.add(legL);
-var legR=legL.clone();legR.position.x=.16;player.add(legR);
+var skinMat=new THREE.MeshStandardMaterial({color:0xf1c49a,roughness:.85});
+var teeMat=new THREE.MeshStandardMaterial({color:0xf5efe4,roughness:.92});
+var pantMat=new THREE.MeshStandardMaterial({color:0x3a5170,roughness:.9});
+var hairMat=new THREE.MeshStandardMaterial({color:0x2a1d15,roughness:.82});
+var body=new THREE.Mesh(new THREE.CapsuleGeometry(.4,.5,8,16),teeMat);
+body.position.y=1.0;player.add(body);
+/* big cute head group (bobs together) */
+var headGrp=new THREE.Group();headGrp.position.y=1.74;player.add(headGrp);
+var head=new THREE.Mesh(new THREE.SphereGeometry(.42,22,18),skinMat);
+head.scale.set(1,.98,.95);headGrp.add(head);
+var hair=new THREE.Mesh(new THREE.SphereGeometry(.45,22,18,0,Math.PI*2,0,Math.PI*0.6),hairMat);
+hair.position.y=.06;headGrp.add(hair);
+var fringe=new THREE.Mesh(new THREE.BoxGeometry(.58,.18,.5),hairMat);
+fringe.position.set(0,.22,.14);fringe.rotation.x=.24;headGrp.add(fringe);
+var glMat=new THREE.MeshStandardMaterial({color:0x20160f,roughness:.5});
+var gl1=new THREE.Mesh(new THREE.TorusGeometry(.13,.024,8,20),glMat);gl1.position.set(-.16,-.02,.36);headGrp.add(gl1);
+var gl2b=gl1.clone();gl2b.position.x=.16;headGrp.add(gl2b);
+var glb=new THREE.Mesh(new THREE.BoxGeometry(.1,.022,.02),glMat);glb.position.set(0,-.01,.38);headGrp.add(glb);
+var eyeMat=new THREE.MeshStandardMaterial({color:0x241a12,roughness:.4});
+var eyeL=new THREE.Mesh(new THREE.SphereGeometry(.05,10,8),eyeMat);eyeL.position.set(-.16,-.02,.4);headGrp.add(eyeL);
+var eyeR=eyeL.clone();eyeR.position.x=.16;headGrp.add(eyeR);
+var armL=new THREE.Mesh(new THREE.CapsuleGeometry(.115,.38,5,10),teeMat);armL.position.set(-.47,1.02,0);player.add(armL);
+var armR=armL.clone();armR.position.x=.47;player.add(armR);
+var legL=new THREE.Mesh(new THREE.CapsuleGeometry(.15,.42,5,10),pantMat);legL.position.set(-.18,.42,0);player.add(legL);
+var legR=legL.clone();legR.position.x=.18;player.add(legR);
+var shoeMat=new THREE.MeshStandardMaterial({color:0xfbfaf6,roughness:.7});
+var shoeL=new THREE.Mesh(new THREE.BoxGeometry(.22,.14,.34),shoeMat);shoeL.position.set(-.18,.09,.06);player.add(shoeL);
+var shoeR=shoeL.clone();shoeR.position.x=.18;player.add(shoeR);
 player.position.set(0,0,4);
 scene.add(player);
 
@@ -842,12 +879,9 @@ function loadBook(book){
       page.innerHTML=
         "<div class='reading-room'>"+
           "<div class='rr-orn'>\u2766</div>"+
-          "<p class='rr-lead'>The complete text streams straight into this reader when Alexandria runs on the web. From here, open the real thing in a new tab \u2014 free, unabridged, public domain.</p>"+
-          "<div class='rr-cta'>"+
-            "<a class='rr-btn' href='https://www.gutenberg.org/ebooks/"+book.id+".html.images' target='_blank' rel='noopener'>Read the full book \u2197</a>"+
-            "<a class='rr-btn ghost' href='https://www.gutenberg.org/ebooks/"+book.id+".epub3.images' target='_blank' rel='noopener'>Download EPUB \u2197</a>"+
-          "</div>"+
-          "<p class='rr-fine'>Project Gutenberg \u00b7 no account \u00b7 no cost</p>"+
+          "<p class='rr-lead'>This reader opens the whole book right here \u2014 you never leave the world.</p>"+
+          "<p class='rr-sub'>The live text needs a connection this preview sandbox blocks. Run Alexandria from a normal web address and "+curBook.t+" fills these pages in full, in this reader.</p>"+
+          "<p class='rr-fine'>Public domain \u00b7 Project Gutenberg</p>"+
         "</div>";
       $("#rd-pos").textContent="preview";
       $("#rd-fill").style.width="0%";
@@ -910,6 +944,18 @@ var introDone=false,introT=-1;
 
 /* ================= main loop ================= */
 var clock=new THREE.Clock();
+function updateEbubble(){
+  var eb=$("#ebubble");if(!eb)return;
+  if(nearLectern&&!$("#reader").classList.contains("open")){
+    var p=nearLectern.position.clone();p.y+=2.6;p.project(camera);
+    if(p.z<1){
+      var x=(p.x*0.5+0.5)*innerWidth,y=(-p.y*0.5+0.5)*innerHeight;
+      eb.style.transform="translate(-50%,-50%) translate("+x.toFixed(0)+"px,"+y.toFixed(0)+"px)";
+      var tt=eb.querySelector(".eb-title");if(tt.textContent!==nearLectern.userData.book.t)tt.textContent=nearLectern.userData.book.t;
+      eb.classList.add("show");
+    }else eb.classList.remove("show");
+  }else eb.classList.remove("show");
+}
 function frame(){
   requestAnimationFrame(frame);
   var dt=Math.min(.05,clock.getDelta());
@@ -947,10 +993,12 @@ function frame(){
     walkPh+=dt*2;speedCur*=Math.max(0,1-dt*8);
   }
   /* walk cycle */
-  var sw=Math.sin(walkPh)* (moving?0.5:0.04);
+  var sw=Math.sin(walkPh)*(moving?0.5:0.05);
   legL.rotation.x=sw;legR.rotation.x=-sw;
-  body.position.y=1.05+Math.abs(Math.sin(walkPh))*(moving?0.05:0.01);
-  head.position.y=1.86+Math.abs(Math.sin(walkPh))*(moving?0.05:0.01);
+  armL.rotation.x=-sw*0.75;armR.rotation.x=sw*0.75;
+  var bounce=Math.abs(Math.sin(walkPh))*(moving?0.06:0.016);
+  body.position.y=1.0+bounce;
+  headGrp.position.y=1.74+bounce;
 
   /* camera */
   var cx=player.position.x+Math.sin(camYaw)*Math.cos(camPitch)*camDist;
@@ -982,6 +1030,7 @@ function frame(){
   fireflies.geometry.attributes.position.needsUpdate=true;
 
   updateNearest();
+  updateEbubble();
   updateDistrict();
   drawMap();
   postfx.render(scene,camera);
