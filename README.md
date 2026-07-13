@@ -1,43 +1,78 @@
-# Art Rewind — The Westward Museum
+# WaveSense — WiFi Spatial Sensing
 
-An interactive time machine for Western art, in the style of "rewind" websites
-like Opera's Web Rewind (web-rewind.com): hold a control and time spools
-backwards, then release to land in a curated stop on the timeline.
+Turn ordinary WiFi into a spatial intelligence system: detect people, measure
+breathing and heart rate, track movement, spot falls, and monitor a room —
+through walls, in the dark, with no cameras or wearables. Just physics.
 
-Here, the timeline is 19,000 years of Western art. Thirteen gallery rooms run
-from the cave walls of Lascaux (17,000 BC) through Classical Antiquity, the
-Gothic centuries, the Renaissance, the Baroque, Rococo, Romanticism,
-Impressionism, Post-Impressionism, Cubism, Abstract Expressionism, and Pop Art
-to the digital present (2026).
+Modeled on [ruvnet/ruview](https://github.com/ruvnet/ruview) (MIT), which does
+this with $8 ESP32 sensors reading WiFi Channel State Information (CSI). This
+app implements the same sensing pipeline as one self-contained web page: it
+ships with a physics-faithful CSI simulator (like RuView's demo mode) and
+accepts a live ESP32 CSI stream over WebSocket for real hardware.
 
 ## Try it
 
 Open `index.html` in any modern browser. No build step, no dependencies, no
-network requests — the whole museum is one self-contained file.
+server, no network requests.
 
-## Interactions
+## Privacy — no memory, no data collection
 
-- **Hold `SPACE`** (or press-and-hold the ◀◀ Rewind button, tap-and-hold on
-  mobile) to travel back in time. The year counter spins, eras flash past,
-  and a synthesized tape-rewind whoosh plays. Release to land in the nearest
-  gallery room.
-- **Hold `F`** (or ▶▶ Forward) to travel toward the present.
-- **`←` / `→`** step one room at a time.
-- **Timeline scrubber** along the bottom — click any year to jump straight to
-  that room.
-- **Click any painting** to open its museum wall label (title, date, medium,
-  and a note on the era's technique).
-- **Sound toggle** in the top bar. All audio is synthesized live with the Web
-  Audio API — there are no audio files.
+- **No storage of any kind**: no cookies, no localStorage, no IndexedDB. Every
+  buffer is RAM for the current tab and vanishes on close/refresh.
+- **No network**: the page makes zero requests. The only optional connection is
+  a WebSocket *you* initiate to *your own* sensor, and nothing received is
+  stored or forwarded.
+- **No cameras, no wearables, no accounts.**
 
-## The collection
+## The physics
 
-Every painting is an original study rendered live in `<canvas>`, in the
-technique of its era — spray-stencilled hands, slip-painted terracotta,
-gold-leaf punchwork, one-point perspective, chiaroscuro, impressionist dabs,
-pointillist dots, drip painting, Ben-Day dots, and pixel sorting. A per-visit
-seed means no two visits paint exactly alike. Each room also dresses the
-gallery in its era: palette, frame style (rock face, stone, gilt, float
-frame), and wall text.
+WiFi measures the channel per OFDM subcarrier (56 of them here, at 5.18 GHz).
+A chest rising ~5 mm with breath lengthens the reflected path, shifting each
+subcarrier's phase by 2π·Δd/λ — and λ ≈ 58 mm, so breathing swings the
+received amplitude measurably. The heartbeat adds a ~0.4 mm ripple on top.
+Walking sweeps the path by centimetres per frame and decorrelates the channel
+entirely. The simulator models all of this: static multipath, per-person
+reflection paths, through-wall attenuation (~9 dB per transit), and noise.
 
-Respects `prefers-reduced-motion`. Works on desktop and mobile.
+## The pipeline (runs on simulated *and* live CSI)
+
+1. **Ingest** — 50 Hz frames × 3 links × 56 subcarriers, decimated to 10 Hz
+   ring buffers.
+2. **Motion** — frame-to-frame decorrelation, scale-free: gait moves the path
+   a large fraction of λ per 20 ms frame, breathing ~0.02 mm, so the first
+   difference separates locomotion from vitals cleanly.
+3. **Aggregation** — top-12 subcarriers by variance, z-scored and sign-aligned
+   so anti-phase subcarriers don't cancel.
+4. **Coherence gating** — a real body drives the selected subcarriers
+   *together*; noise leaves them uncorrelated. Kills false vitals in empty
+   rooms.
+5. **Vitals** — Hann-windowed 1024-pt FFT, band peaks (respiration
+   0.08–0.55 Hz, heart 0.75–2.2 Hz) with sub-bin parabolic interpolation,
+   breathing-harmonic rejection in the heart band.
+6. **Presence** — motion or coherent vitals, with hysteresis.
+7. **People count** — distinct respiration peaks (harmonics and leakage
+   shoulders rejected), +1 for a walker who masks their own peak.
+8. **Fall watch** — motion spike followed by stillness.
+9. **Localization** — per-link dynamic energy matched against a path-loss grid
+   model; coarse, honest, and computed without ever seeing coordinates.
+
+The detections you see are *earned*: the estimator only consumes the same
+amplitude frames a real sensor would produce. In verification runs it recovers
+breathing rate within ±0.1 BPM and heart rate within ±2 BPM of the simulated
+ground truth, keeps empty rooms (even at high noise) presence-free, and places
+a resting person within ~1 m.
+
+## Scenarios
+
+Empty room · one person resting · sleeping · walking (vitals correctly refuse
+to read during locomotion) · two people (two spectral peaks) · fall test.
+Toggle the interior wall to watch SNR drop while presence and breathing hold.
+Crank the noise slider to stress the detectors. "Show ground truth" overlays
+the simulator's real positions against the pipeline's estimates.
+
+## Live hardware (optional)
+
+Flash the [ruvnet/ruview](https://github.com/ruvnet/ruview) ESP32-S3 CSI
+firmware, run its sensing server, and point the Live Sensor panel at it —
+frames are JSON `{"a":[…56 amplitudes]}` (or a bare array) over WebSocket, fed
+into the identical pipeline.
