@@ -1,0 +1,22 @@
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#20180f}
+#folio{display:block;width:100vw;height:100vh}
+#ui{
+  position:fixed;right:14px;bottom:12px;
+  display:flex;align-items:center;gap:8px;
+  font:12px/1 Georgia,"Times New Roman",serif;
+  opacity:.28;transition:opacity .25s;
+}
+#ui:hover{opacity:1}
+#seedChip{
+  color:#5a452c;background:rgba(240,228,196,.75);
+  border:1px solid rgba(90,69,44,.35);border-radius:999px;
+  padding:5px 12px;letter-spacing:.06em;font-variant:small-caps;
+}
+#ui button{
+  font:inherit;font-variant:small-caps;letter-spacing:.08em;
+  color:#3d2f1c;background:rgba(240,228,196,.75);
+  border:1px solid rgba(90,69,44,.45);border-radius:999px;
+  padding:5px 13px;cursor:pointer;
+}
+#ui button:hover{background:rgba(228,210,168,.95)}

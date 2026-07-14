@@ -1,3 +1,6 @@
+> Also in this repo: [`fractal-codex/`](fractal-codex/) — a Chrome extension
+> that draws a never-before-seen Da Vinci–style fractal folio on every new tab.
+
 # WaveSense — WiFi Spatial Sensing
 
 Turn ordinary WiFi into a spatial intelligence system: detect people, measure
