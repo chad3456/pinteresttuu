@@ -8,11 +8,18 @@
 </head>
 <body>
 <canvas id="folio"></canvas>
+<canvas id="spark"></canvas>
+<blockquote id="quote" aria-live="polite">
+  <p id="quoteWords"></p>
+  <footer id="quoteAuthor"></footer>
+</blockquote>
+<div id="equation" title="The living equation of this folio — move the cursor and watch its constants change"></div>
 <div id="ui">
   <span id="seedChip" title="The seed of this folio — 128 bits of fresh entropy, so no two folios in history are alike"></span>
   <button id="regen" title="Draw a new folio (N)">Nuovo folio</button>
   <button id="save" title="Save this folio as a PNG (S)">Salva</button>
 </div>
+<script src="quotes.js"></script>
 <script src="newtab.js"></script>
 </body>
 </html>

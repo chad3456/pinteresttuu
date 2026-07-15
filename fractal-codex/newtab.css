@@ -1,6 +1,48 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;background:#20180f}
 #folio{display:block;width:100vw;height:100vh}
+#spark{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none}
+
+/* ---------------- the quotation, revealed like enchanted ink ---------------- */
+#quote{
+  position:fixed;max-width:36ch;pointer-events:none;
+  font-family:"Segoe Script","Apple Chancery","Snell Roundhand","Brush Script MT","Dancing Script",cursive;
+  font-style:italic;                 /* stays script-like even on serif fallback */
+  font-size:clamp(17px,2.1vw,26px);line-height:1.75;
+  color:#43301b;
+}
+#quote .w{
+  display:inline-block;white-space:pre;
+  opacity:0.055;filter:blur(3px);
+  transform:translateY(2px) rotate(.4deg);
+  transition:opacity 1.1s ease, filter 1.1s ease, transform 1.1s ease, text-shadow 1.1s ease;
+}
+#quote .w.lit{
+  opacity:.92;filter:blur(0);transform:none;
+}
+#quote .w.flash{
+  text-shadow:0 0 6px rgba(255,215,120,.95), 0 0 18px rgba(255,190,80,.6);
+}
+#quoteAuthor{
+  margin-top:.5em;text-align:right;
+  font-size:.72em;opacity:0;transition:opacity 2.2s ease .4s;
+  color:#6b4f2a;
+}
+#quoteAuthor.lit{opacity:.85}
+
+/* ---------------- the living equation ---------------- */
+#equation{
+  position:fixed;left:18px;bottom:14px;max-width:46ch;
+  font:italic 13.5px Georgia,"Times New Roman",serif;
+  color:#54401f;letter-spacing:.02em;line-height:1.5;
+  background:rgba(240,228,196,.55);border:1px solid rgba(90,69,44,.28);
+  border-radius:10px;padding:7px 12px;
+  opacity:.75;transition:opacity .25s;
+}
+#equation:hover{opacity:1}
+#equation .fam{font-style:normal;font-variant:small-caps;letter-spacing:.09em;margin-right:.6em}
+
+/* ---------------- controls ---------------- */
 #ui{
   position:fixed;right:14px;bottom:12px;
   display:flex;align-items:center;gap:8px;
@@ -20,3 +62,7 @@ html,body{height:100%;overflow:hidden;background:#20180f}
   padding:5px 13px;cursor:pointer;
 }
 #ui button:hover{background:rgba(228,210,168,.95)}
+
+@media (prefers-reduced-motion: reduce){
+  #quote .w{transition:opacity .3s ease}
+}

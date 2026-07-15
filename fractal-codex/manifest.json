@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Codice dei Frattali — Da Vinci Fractal Folios",
   "short_name": "Codice dei Frattali",
-  "version": "1.0.0",
-  "description": "Every new tab is a one-of-a-kind fractal folio that has never existed before, drawn in the hand of Leonardo — ink, red chalk, golden ratio, mirror script. No permissions, no network, no data collection.",
+  "version": "2.0.0",
+  "description": "Every new tab is a living fractal folio that has never existed before, drawn in the hand of Leonardo. It follows your cursor — the equation rewrites itself as you move — and an enchanted quotation appears wherever the hand passes. No permissions, no network, no data collection.",
   "chrome_url_overrides": { "newtab": "newtab.html" },
   "icons": {
     "16": "icons/icon16.png",
