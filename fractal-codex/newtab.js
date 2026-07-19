@@ -55,7 +55,7 @@ const store = {
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} },
 };
 const EQ_HISTORY_KEY = "cf_eq_hist";       // last 60 equation signatures
-const QUOTES_USED_KEY = "cf_quotes_used";  // quote indices already shown
+const QUOTES_USED_KEY = "cf_quotes_used_v2";  // quote indices already shown (v2 library)
 const FAM_RECENT_KEY = "cf_fam_recent";    // last few styles, for variety
 
 /* --------------------------- palette --------------------------------- */

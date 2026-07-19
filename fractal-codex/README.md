@@ -42,9 +42,14 @@ one of six studies (2¹²⁸ possible folios — no repetition, ever):
 - **Equations:** the equation signature of each folio is kept in a rolling
   list of 60; a new folio that would collide re-seeds itself. So an equation
   you've seen won't reappear for at least 60 new tabs.
-- **Quotes:** ~150 quotations from Leonardo, Shakespeare, Austen-era to modern
-  authors; each is used once, and only when the whole library is exhausted
-  does the cycle restart.
+- **Quotes:** ~130 quotations drawn from the Iliad and the Odyssey (Butler and
+  Pope's public-domain translations), the Bhagavad Gita (with verse numbers),
+  Nietzsche's *Human, All Too Human*, Dostoevsky's *Crime and Punishment*,
+  *The Brothers Karamazov* and *The Idiot* (Garnett translation), the *Maxims*
+  of François de La Rochefoucauld, the Shiva Purana, and the Chanakya Niti —
+  plus a handful of other classical voices. Every quote is attributed to its
+  author *and* work; each is used once, and only when the whole library is
+  exhausted does the cycle restart.
 
 ## Install
 
